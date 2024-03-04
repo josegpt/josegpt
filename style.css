@@ -1,0 +1,135 @@
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+	margin: 0;
+	padding: 0;
+	-webkit-tap-highlight-color: transparent;
+}
+
+*:focus {
+	outline: none;
+}
+
+html {
+	box-sizing: border-box;
+	scroll-behavior: smooth;
+}
+
+:root {
+	--primary-color: white;
+	--secondary-color: black;
+	--accent-color: red;
+	--link-color: dodgerblue;
+}
+
+@media only screen and (prefers-color-scheme: dark) {
+	:root {
+		--primary-color: black;
+		--secondary-color: white;
+	}
+}
+
+body {
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+	line-height: 1.6;
+	max-width: 115ch;
+	margin-inline: auto;
+}
+
+::-moz-selection {
+	background-color: var(--accent-color);
+}
+
+::selection {
+	background-color: var(--accent-color);
+}
+
+h1 {
+	font-size: xx-large;
+}
+
+h2 {
+	font-size: x-large;
+}
+
+a {
+	text-decoration: none;
+}
+
+a,
+a:link,
+a:visited {
+	color: var(--link-color);
+}
+
+a:focus,
+a:hover {
+	text-decoration: underline;
+}
+
+body {
+	background-color: var(--primary-color);
+	color: var(--secondary-color);
+	padding: 1rem;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(40ch, 100%), 1fr));
+	align-content: start;
+	gap: 2rem;
+}
+
+.cluster {
+	justify-content: flex-start;
+	align-items: flex-start;
+	gap: 1rem;
+}
+
+.cluster[data-justify=center] {
+	justify-content: center;
+}
+
+.cluster[data-align=center] {
+	align-items: center;
+}
+
+.cover {
+	min-block-size: 100vh;
+}
+
+.cover> :first-child:not(main) {
+	margin-block-start: 0;
+}
+
+.cover> :last-child:not(main) {
+	margin-block-end: 0;
+}
+
+.cover>main {
+	flex: 1;
+}
+
+.cover>* {
+	margin-block: 1rem;
+}
+
+.cluster {
+	flex-wrap: wrap;
+}
+
+.cover,
+.stack,
+.cluster {
+	display: flex;
+}
+
+.cover,
+.stack {
+	flex-direction: column;
+}
+
+.text-align\:center {
+	text-align: center;
+}
