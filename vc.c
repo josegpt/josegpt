@@ -14,36 +14,51 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef JOSEGPT_H
-#define JOSEGPT_H
+#include "vc.h"
+#include "github.c"
 
-#define MAXPROJECTS 32
+size_t
+vc_get(struct project *project)
+{
+	return github_get(project);
+}
 
-enum license {
-	ISC,
-	MIT,
-	GPL3,
-	AGPL3,
-	LGPL3
-};
+const char *
+licensestr(enum license l)
+{
+	const char *result;
+	switch (l) {
+	case ISC:
+		result = "ISC";
+	break;
+	case MIT:
+		result = "MIT";
+	break;
+	case GPL3:
+		result = "GPL3";
+	break;
+	default:
+		result = "None";
+	}
+	return result;
+}
 
-enum language {
-	C,
-	SHELL,
-	EMACSLISP
-};
-
-struct project {
-	const char *name;
-	const char *description;
-	const char *url;
-	enum license license;
-	enum language language;
-};
-
-struct portfolio {
-	struct project projects[MAXPROJECTS];
-	size_t size;
-};
-
-#endif /* JOSEGPT_H */
+const char *
+languagestr(enum language l)
+{
+	const char *result;
+	switch (l) {
+	case C:
+		result = "C";
+	break;;
+	case SHELL:
+		result = "Shell";
+	break;
+	case EMACSLISP:
+		result = "Elisp";
+	break;
+	default:
+		result = "Unknown";
+	}
+	return result;
+}

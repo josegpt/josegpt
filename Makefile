@@ -1,18 +1,25 @@
-VERSION=	0.0
+VERSION?=	dev
+DEBUG?=		0
 
 PREFIX=		${DESTDIR}/var/www
 CGIDIR=		${PREFIX}/cgi-bin
 HTDOCSDIR=	${PREFIX}/htdocs/josegpt
 
-CFLAGS=		-O2 -W -Wall -Werror -Wextra -pedantic -ansi -g
-LDFLAGS=	-static -pie
+JSONINCS=	/usr/local/include/json-c
+JSONLIB=	/usr/local/lib
+
+INCS=		-I${JSONINCS}
+LIBS=		-L${JSONLIB} -ljson-c
+
+CFLAGS=		-O2 -g -W -Wall -Werror -Wextra -pedantic ${INCS}
+LDFLAGS=	-static -pie ${LIBS}
 
 all: josegpt
 
 .c.o:
-	${CC} -DVERSION=${VERSION} ${CFLAGS} -c $<
+	${CC} -DDEBUG=${DEBUG} -DVERSION=\"${VERSION}\" ${CFLAGS} -c $<
 
-josegpt: html.o
+josegpt: josegpt.o
 	${CC} -o $@ ${LDFLAGS} $?
 
 clean:
