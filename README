@@ -1,0 +1,14 @@
+josegpt.com
+===========
+	my personal website.
+
+depends on
+----------
+	* c
+	* libc
+	* httpd
+	* slowcgi
+
+license
+-------
+	isc
