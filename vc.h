@@ -39,11 +39,6 @@ struct project {
 	enum language language;
 };
 
-struct portfolio {
-	struct project projects[32];
-	size_t         howmany;
-};
-
 #include "github.h"
 
 size_t      vc_get(struct project *);
