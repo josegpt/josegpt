@@ -27,6 +27,7 @@ enum license {
 enum language {
 	UNKNOWN,
 	C,
+	HTML_,
 	SHELL,
 	EMACSLISP
 };

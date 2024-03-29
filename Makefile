@@ -1,5 +1,4 @@
 VERSION?=	dev
-DEBUG?=		0
 
 PREFIX=		${DESTDIR}/var/www
 CGIDIR=		${PREFIX}/cgi-bin
@@ -17,7 +16,7 @@ LDFLAGS=	-static -pie ${LIBS}
 all: josegpt
 
 .c.o:
-	${CC} -DDEBUG=${DEBUG} -DVERSION=\"${VERSION}\" ${CFLAGS} -c $<
+	${CC} -DVERSION=\"${VERSION}\" ${CFLAGS} -c $<
 
 josegpt: josegpt.o
 	${CC} -o $@ ${LDFLAGS} $?

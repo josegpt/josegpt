@@ -50,7 +50,10 @@ languagestr(enum language l)
 	switch (l) {
 	case C:
 		result = "C";
-	break;;
+	break;
+	case HTML_:
+		result = "HTML";
+	break;
 	case SHELL:
 		result = "Shell";
 	break;

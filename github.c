@@ -33,6 +33,7 @@ strlanguage(const char *str)
 {
 	enum language result;
 	if      (strncmp("C", str, 1) == 0)           result = C;
+	else if (strncmp("HTML", str, 4) == 0)        result = HTML_;
 	else if (strncmp("Shell", str, 5) == 0)       result = SHELL;
 	else if (strncmp("Emacs Lisp", str, 10) == 0) result = EMACSLISP;
 	else                                          result = UNKNOWN;
