@@ -17,7 +17,7 @@
 #ifndef GITHUB_H
 #define GITHUB_H
 
-#define PROJECTSFILE "/conf/projects.json"
+#define PROJECTSFILE "/cache/projects.json"
 
 size_t github_get(struct project *);
 
