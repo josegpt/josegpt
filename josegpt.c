@@ -51,7 +51,7 @@ main(void)
 	html_endmeta(&html);
 
 	html_begintitle(&html);
-	html_text(&html, "josegpt &sol; %s", "Portfolio");
+	html_text(&html, "josegpt &sol; %s", "projects");
 	html_endtitle(&html);
 
 	html_beginmeta(&html);
@@ -110,7 +110,7 @@ main(void)
 
 	html_beginmeta(&html);
 	html_begincontent(&html);
-	html_text(&html, "josegpt &sol; %s", "Portfolio");
+	html_text(&html, "josegpt &sol; %s", "projects");
 	html_endcontent(&html);
 	html_beginproperty(&html);
 	html_text(&html, "og:title");
@@ -137,7 +137,7 @@ main(void)
 
 	html_beginmeta(&html);
 	html_begincontent(&html);
-	html_text(&html, "/josegpt/banner.png");
+	html_text(&html, "/static/banner.png");
 	html_endcontent(&html);
 	html_beginproperty(&html);
 	html_text(&html, "og:image");
@@ -149,7 +149,7 @@ main(void)
 	html_text(&html, "icon");
 	html_endrel(&html);
 	html_beginhref(&html);
-	html_text(&html, "/josegpt/favicon.ico");
+	html_text(&html, "/static/favicon.ico");
 	html_endhref(&html);
 	html_begintype(&html);
 	html_text(&html, "image/x-icon");
@@ -162,7 +162,7 @@ main(void)
 	html_text(&html, "stylesheet");
 	html_endcontent(&html);
 	html_beginhref(&html);
-	html_text(&html, "/josegpt/style.css");
+	html_text(&html, "/static/style.css");
 	html_endhref(&html);
 	html_begintype(&html);
 	html_text(&html, "text/css");
@@ -205,11 +205,11 @@ main(void)
 	html_endheight(&html);
 
 	html_beginwidth(&html);
-	html_text(&html, "%d", 60);
+	html_text(&html, "%d", 50);
 	html_endwidth(&html);
 
 	html_beginsrc(&html);
-	html_text(&html, "/josegpt/logo.svg");
+	html_text(&html, "/static/logo.svg");
 	html_endsrc(&html);
 
 	html_beginalt(&html);
@@ -222,7 +222,7 @@ main(void)
 	html_begindiv(&html);
 
 	html_beginspan(&html);
-	html_text(&html, "Portfolio");
+	html_text(&html, "projects");
 	html_endspan(&html);
 
 	html_enddiv(&html);
@@ -233,12 +233,12 @@ main(void)
 	if (n > 0) {
 		html_beginmain(&html);
 		html_beginclass(&html);
-		html_text(&html, "grid");
+		html_text(&html, "stack");
 		html_endclass(&html);
 
 		for (pp = projects; pp->name; ++pp) {
 			html_beginarticle(&html);
-			html_beginh4(&html);
+			html_beginh2(&html);
 			html_beginanchor(&html);
 
 			html_beginhref(&html);
@@ -254,18 +254,16 @@ main(void)
 			html_text(&html, pp->name);
 
 			html_endanchor(&html);
-			html_endh4(&html);
+			html_endh2(&html);
 
 			html_beginp(&html);
 			html_text(&html, pp->description);
 			html_endp(&html);
 
 			html_beginfooter(&html);
-			html_beginsmall(&html);
 			html_beginem(&html);
 			html_text(&html, "%s@%s", languagestr(pp->language), licensestr(pp->license));
 			html_endem(&html);
-			html_endsmall(&html);
 			html_endfooter(&html);
 			html_endarticle(&html);
 		}
@@ -298,8 +296,12 @@ main(void)
 		html_endmain(&html);
 	}
 
-	html_beginnav(&html);
+	html_beginfooter(&html);
+	html_beginclass(&html);
+	html_text(&html, "stack");
+	html_endclass(&html);
 
+	html_beginnav(&html);
 	html_beginclass(&html);
 	html_text(&html, "cluster");
 	html_endclass(&html);
@@ -313,20 +315,6 @@ main(void)
 	html_text(&html, "mailto:josegpt27@gmail.com");
 	html_endhref(&html);
 	html_text(&html, "Email");
-	html_endanchor(&html);
-
-	html_beginanchor(&html);
-	html_beginhref(&html);
-	html_text(&html, "https://www.linkedin.com/in/josegpt");
-	html_endhref(&html);
-	html_begintarget(&html);
-	html_text(&html, "_blank");
-	html_endtarget(&html);
-	html_beginrel(&html);
-	html_text(&html, "noopener");
-	html_text(&html, "noreferrer");
-	html_endrel(&html);
-	html_text(&html, "LinkedIn");
 	html_endanchor(&html);
 
 	html_beginanchor(&html);
@@ -357,23 +345,9 @@ main(void)
 	html_text(&html, "GitHub");
 	html_endanchor(&html);
 
-	html_beginanchor(&html);
-	html_beginhref(&html);
-	html_text(&html, "https://codepen.io/josegpt");
-	html_endhref(&html);
-	html_begintarget(&html);
-	html_text(&html, "_blank");
-	html_endtarget(&html);
-	html_beginrel(&html);
-	html_text(&html, "noopener");
-	html_text(&html, "noreferrer");
-	html_endrel(&html);
-	html_text(&html, "Codepen");
-	html_endanchor(&html);
-
 	html_endnav(&html);
 
-	html_beginfooter(&html);
+	html_beginp(&html);
 	html_beginclass(&html);
 	html_text(&html, "cluster");
 	html_endclass(&html);
@@ -386,46 +360,17 @@ main(void)
 	html_text(&html, "center");
 	html_enddata(&html);
 
-	html_beginanchor(&html);
-	html_beginclass(&html);
-	html_text(&html, "cluster");
-	html_endclass(&html);
-
-	html_beginhref(&html);
-	html_text(&html, "/");
-	html_endhref(&html);
-
-	html_beginimage(&html);
-	html_beginheight(&html);
-	html_text(&html, "%d", 15);
-	html_endheight(&html);
-
-	html_beginwidth(&html);
-	html_text(&html, "%d", 30);
-	html_endwidth(&html);
-
-	html_beginsrc(&html);
-	html_text(&html, "/josegpt/logo.svg");
-	html_endsrc(&html);
-
-	html_beginalt(&html);
-	html_text(&html, "Logo");
-	html_endalt(&html);
-
-	html_endimage(&html);
-	html_endanchor(&html);
-
 	html_beginsmall(&html);
 	html_text(&html, "&copy2017 ");
+	html_text(&html, "josegpt&commat;");
 	html_beginem(&html);
-	html_text(&html, "josegpt&commat;%s", VERSION);
+	html_text(&html, VERSION);
 	html_endem(&html);
 	html_endsmall(&html);
 
 	html_endfooter(&html);
-
 	html_endbody(&html);
-
 	html_end(&html);
+
 	return EXIT_SUCCESS;
 }

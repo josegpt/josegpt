@@ -31,10 +31,11 @@ html {
 }
 
 body {
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+	font-family: monospace;
 	line-height: 1.6;
-	max-width: 115ch;
+	max-width: 80ch;
 	margin-inline: auto;
+	text-transform: lowercase;
 }
 
 ::-moz-selection {
@@ -50,7 +51,7 @@ h1 {
 }
 
 h2 {
-	font-size: x-large;
+	font-size: large;
 }
 
 a {
@@ -74,44 +75,36 @@ body {
 	padding: 1rem;
 }
 
-.grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(min(40ch, 100%), 1fr));
-	align-content: start;
-	gap: 2rem;
-}
-
 .cluster {
 	justify-content: flex-start;
 	align-items: flex-start;
-	gap: 1rem;
-}
-
-.cluster[data-justify=center] {
-	justify-content: center;
 }
 
 .cluster[data-align=center] {
 	align-items: center;
 }
 
+.cluster[data-justify=center] {
+	justify-content: center;
+}
+
 .cover {
 	min-block-size: 100vh;
 }
 
-.cover> :first-child:not(main) {
+.cover > :first-child:not(main) {
 	margin-block-start: 0;
 }
 
-.cover> :last-child:not(main) {
+.cover > :last-child:not(main) {
 	margin-block-end: 0;
 }
 
-.cover>main {
+.cover > main {
 	flex: 1;
 }
 
-.cover>* {
+.cover > * {
 	margin-block: 1rem;
 }
 
@@ -128,6 +121,11 @@ body {
 .cover,
 .stack {
 	flex-direction: column;
+}
+
+.stack,
+.cluster {
+	gap: 1rem;
 }
 
 .text-align\:center {
