@@ -137,7 +137,7 @@ main(void)
 
 	html_beginmeta(&html);
 	html_begincontent(&html);
-	html_text(&html, "/static/banner.png");
+	html_text(&html, "/static/img/banner.png");
 	html_endcontent(&html);
 	html_beginproperty(&html);
 	html_text(&html, "og:image");
@@ -149,7 +149,7 @@ main(void)
 	html_text(&html, "icon");
 	html_endrel(&html);
 	html_beginhref(&html);
-	html_text(&html, "/static/favicon.ico");
+	html_text(&html, "/static/img/favicon.ico");
 	html_endhref(&html);
 	html_begintype(&html);
 	html_text(&html, "image/x-icon");
@@ -162,7 +162,7 @@ main(void)
 	html_text(&html, "stylesheet");
 	html_endcontent(&html);
 	html_beginhref(&html);
-	html_text(&html, "/static/style.css");
+	html_text(&html, "/static/css/style.css");
 	html_endhref(&html);
 	html_begintype(&html);
 	html_text(&html, "text/css");
@@ -209,7 +209,7 @@ main(void)
 	html_endwidth(&html);
 
 	html_beginsrc(&html);
-	html_text(&html, "/static/logo.svg");
+	html_text(&html, "/static/img/logo.svg");
 	html_endsrc(&html);
 
 	html_beginalt(&html);

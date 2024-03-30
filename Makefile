@@ -26,8 +26,8 @@ clean:
 
 install: all
 	mkdir -p ${CGIDIR} ${HTDOCSDIR}
-	cp -Rp josegpt ${CGIDIR}
-	cp -Rp logo.svg favicon.ico style.css ${HTDOCSDIR}
+	cp -p josegpt ${CGIDIR}
+	cp -Rp static ${HTDOCSDIR}
 
 uninstall:
 	rm -rf ${CGIDIR}/josegpt ${HTDOCSDIR}
