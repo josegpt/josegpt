@@ -35,6 +35,7 @@ strlanguage(const char *str)
 	if      (strcmp("C", str) == 0)          result = C;
 	else if (strcmp("HTML", str) == 0)       result = HTML_;
 	else if (strcmp("Shell", str) == 0)      result = SHELL;
+	else if (strcmp("Makefile", str) == 0)   result = MAKEFILE;
 	else if (strcmp("Emacs Lisp", str) == 0) result = EMACSLISP;
 	else                                     result = UNKNOWN;
 	return result;

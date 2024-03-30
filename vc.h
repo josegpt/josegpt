@@ -29,6 +29,7 @@ enum language {
 	C,
 	HTML_,
 	SHELL,
+	MAKEFILE,
 	EMACSLISP
 };
 
