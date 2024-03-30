@@ -34,9 +34,9 @@ enum language {
 };
 
 struct project {
-	const char   *name;
-	const char   *description;
-	const char   *url;
+	char         *name;
+	char         *description;
+	char         *url;
 	enum license  license;
 	enum language language;
 };
