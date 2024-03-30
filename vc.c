@@ -57,6 +57,9 @@ languagestr(enum language l)
 	case SHELL:
 		result = "Shell";
 	break;
+	case MAKEFILE:
+		result = "Makefile";
+	break;
 	case EMACSLISP:
 		result = "Elisp";
 	break;
