@@ -49,7 +49,7 @@ github_get(struct project *projects)
 	const char         *str;
 	size_t              i, n;
 
-	jsonp = json_object_from_file(PROJECTSFILE);
+	jsonp = json_object_from_file("/cache/projects.json");
 	if (jsonp) {
 		n = json_object_array_length(jsonp);
 		for (i = 0, pp = projects; i < n; ++i, ++pp) {
