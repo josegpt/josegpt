@@ -21,10 +21,10 @@ static enum license
 strlicense(const char *str)
 {
 	enum license result;
-	if      (strncmp("ISC", str, 3) == 0)     result = ISC;
-	else if (strncmp("MIT", str, 3) == 0)     result = MIT;
-	else if (strncmp("GPL-3.0", str, 4) == 0) result = GPL3;
-	else                                      result = NONE;
+	if      (strcmp("ISC", str) == 0)     result = ISC;
+	else if (strcmp("MIT", str) == 0)     result = MIT;
+	else if (strcmp("GPL-3.0", str) == 0) result = GPL3;
+	else                                  result = NONE;
 	return result;
 }
 
@@ -32,11 +32,11 @@ static enum language
 strlanguage(const char *str)
 {
 	enum language result;
-	if      (strncmp("C", str, 1) == 0)           result = C;
-	else if (strncmp("HTML", str, 4) == 0)        result = HTML_;
-	else if (strncmp("Shell", str, 5) == 0)       result = SHELL;
-	else if (strncmp("Emacs Lisp", str, 10) == 0) result = EMACSLISP;
-	else                                          result = UNKNOWN;
+	if      (strcmp("C", str) == 0)          result = C;
+	else if (strcmp("HTML", str) == 0)       result = HTML_;
+	else if (strcmp("Shell", str) == 0)      result = SHELL;
+	else if (strcmp("Emacs Lisp", str) == 0) result = EMACSLISP;
+	else                                     result = UNKNOWN;
 	return result;
 }
 
