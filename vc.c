@@ -76,9 +76,9 @@ licensestr(enum license a)
 	for (i = 0; i < nitems(licensetable); ++i) {
 		b = licensetable[i];
 		if (b.license == a)
-			return b.to;
+			return (b.to);
 	}
-	return "None";
+	return ("None");
 }
 
 static const char *
@@ -90,9 +90,9 @@ languagestr(enum language a)
 	for (i = 0; i < nitems(languagetable); ++i) {
 		b = languagetable[i];
 		if (b.language == a)
-			return b.to;
+			return (b.to);
 	}
-	return "Unknown";
+	return ("Unknown");
 }
 
 static enum license
@@ -104,9 +104,9 @@ strlicense(const char *str)
 	for (i = 0; i < nitems(licensetable); ++i) {
 		l = licensetable[i];
 		if (strcmp(l.from, str) == 0)
-			return l.license;
+			return (l.license);
 	}
-	return NONE;
+	return (NONE);
 }
 
 static enum language
@@ -118,59 +118,45 @@ strlanguage(const char *str)
 	for (i = 0; i < nitems(languagetable); ++i) {
 		l = languagetable[i];
 		if (strcmp(l.from, str) == 0)
-			return l.language;
+			return (l.language);
 	}
-	return UNKNOWN;
+	return (UNKNOWN);
 }
 
 static size_t
 jsonprojects(struct project *projects)
 {
-	struct json_object *jsonp, *project, *name, *description, *url;
+	struct json_object *jsonp, *project, *name, *desc, *url;
 	struct json_object *license, *spdxid, *language;
 	struct project     *pp;
-	const char         *str;
 	size_t              i, n;
 
 	jsonp = json_object_from_file("/cache/projects.json");
-	if (jsonp) {
-		n = json_object_array_length(jsonp);
-		for (i = 0, pp = projects; i < n; ++i, ++pp) {
-			project = json_object_array_get_idx(jsonp, i);
-			if (json_object_object_get_ex(project, "name", &name)) {
-				str = json_object_get_string(name);
-				if (str) pp->name = strdup(str);
-			}
+	if (jsonp == NULL)
+		return (0);
 
-			if (json_object_object_get_ex(project, "description", &description)) {
-				str = json_object_get_string(description);
-				if (str) pp->description = strdup(str);
-			}
+	n = json_object_array_length(jsonp);
+	for (i = 0, pp = projects; i < n; ++i, ++pp) {
+		project = json_object_array_get_idx(jsonp, i);
 
-			if (json_object_object_get_ex(project, "html_url", &url)) {
-				str = json_object_get_string(url);
-				if (str) pp->url = strdup(str);
-			}
+		json_object_object_get_ex(project, "name", &name);
+		json_object_object_get_ex(project, "description", &desc);
+		json_object_object_get_ex(project, "url", &url);
+		json_object_object_get_ex(project, "license", &license);
+		json_object_object_get_ex(project, "language", &language);
 
-			if (json_object_object_get_ex(project, "license", &license)) {
-				if (json_object_object_get_ex(license, "spdx_id", &spdxid)) {
-					str = json_object_get_string(spdxid);
-					if (str) pp->license = strlicense(str);
-					else     pp->license = NONE;
-				}
-			}
+		json_object_object_get_ex(license, "spdx_id", &spdxid);
 
-			if (json_object_object_get_ex(project, "language", &language)) {
-				str = json_object_get_string(language);
-				if (str) pp->language = strlanguage(str);
-				else     pp->language = UNKNOWN;
-			}
-		}
-		json_object_put(jsonp);
-		jsonp = NULL;
-	} else {
-		n = 0;
+		pp->name = strdup(name ? json_object_get_string(name) : "noname");
+		pp->description = strdup(desc ? json_object_get_string(desc) : "nodescription");
+		pp->url = strdup(url ? json_object_get_string(url) : "nourl");
+		pp->license = spdxid ? strlicense(json_object_get_string(spdxid)) : NONE;
+		pp->language = language ? strlanguage(json_object_get_string(language)) : UNKNOWN;
 	}
-	return n;
+
+	json_object_put(jsonp);
+	jsonp = NULL;
+
+	return (n);
 }
 
