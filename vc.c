@@ -57,6 +57,16 @@ vc_getprojects(struct project *project)
 	return jsonprojects(project);
 }
 
+void
+vc_unrefproject(struct project *project)
+{
+	if (project) {
+		free(project->name);
+		free(project->description);
+		free(project->url);
+	}
+}
+
 static const char *
 licensestr(enum license a)
 {

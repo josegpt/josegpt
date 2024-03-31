@@ -266,6 +266,8 @@ main(void)
 			html_endem(&html);
 			html_endfooter(&html);
 			html_endarticle(&html);
+
+			vc_unrefproject(pp);
 		}
 
 		html_endmain(&html);

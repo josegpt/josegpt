@@ -42,6 +42,7 @@ struct project {
 };
 
 size_t      vc_getprojects(struct project *);
+void        vc_unrefproject(struct project *);
 const char *vc_licensestr(enum license);
 const char *vc_languagestr(enum language);
 
