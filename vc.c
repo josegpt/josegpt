@@ -19,28 +19,98 @@
 
 #include "vc.h"
 
+#define nitems(aa) (sizeof(aa) / sizeof(aa[0]))
+
+struct licenserow {
+	const char  *from;
+	const char  *to;
+	enum license license;
+};
+
+struct languagerow {
+	const char   *from;
+	const char   *to;
+	enum language language;
+};
+
+static struct licenserow licensetable[] = {
+	{"ISC",     "isc",  ISC},
+	{"MIT",     "mit",  MIT},
+	{"GPL-3.0", "gpl3", GPL3},
+};
+
+static struct languagerow languagetable[] = {
+	{"C",          "c",        C},
+	{"HTML",       "html",     HTML_},
+	{"Shell",      "shell",    SHELL},
+	{"Makefile",   "makefile", MAKEFILE},
+	{"Emacs Lisp", "elisp",    EMACSLISP},
+};
+
+static enum license  strlicense(const char *);
+static enum language strlanguage(const char *);
+static size_t        jsonprojects(struct project *);
+
+size_t
+vc_getprojects(struct project *project)
+{
+	return jsonprojects(project);
+}
+
+static const char *
+licensestr(enum license a)
+{
+	struct licenserow b;
+	size_t i;
+
+	for (i = 0; i < nitems(licensetable); ++i) {
+		b = licensetable[i];
+		if (b.license == a)
+			return b.to;
+	}
+	return "None";
+}
+
+static const char *
+languagestr(enum language a)
+{
+	struct languagerow b;
+	size_t i;
+
+	for (i = 0; i < nitems(languagetable); ++i) {
+		b = languagetable[i];
+		if (b.language == a)
+			return b.to;
+	}
+	return "Unknown";
+}
+
 static enum license
 strlicense(const char *str)
 {
-	enum license result;
-	if      (strcmp("ISC", str) == 0)     result = ISC;
-	else if (strcmp("MIT", str) == 0)     result = MIT;
-	else if (strcmp("GPL-3.0", str) == 0) result = GPL3;
-	else                                  result = NONE;
-	return result;
+	struct licenserow l;
+	size_t i;
+
+	for (i = 0; i < nitems(licensetable); ++i) {
+		l = licensetable[i];
+		if (strcmp(l.from, str) == 0)
+			return l.license;
+	}
+	return NONE;
 }
 
 static enum language
 strlanguage(const char *str)
 {
-	enum language result;
-	if      (strcmp("C", str) == 0)          result = C;
-	else if (strcmp("HTML", str) == 0)       result = HTML_;
-	else if (strcmp("Shell", str) == 0)      result = SHELL;
-	else if (strcmp("Makefile", str) == 0)   result = MAKEFILE;
-	else if (strcmp("Emacs Lisp", str) == 0) result = EMACSLISP;
-	else                                     result = UNKNOWN;
-	return result;
+	struct languagerow l;
+	size_t i;
+
+	for (i = 0; i < nitems(languagetable); ++i) {
+		l = languagetable[i];
+		if (strcmp(l.from, str) == 0)
+			return l.language;
+	}
+	return UNKNOWN;
 }
 
 static size_t
@@ -92,57 +162,5 @@ jsonprojects(struct project *projects)
 		n = 0;
 	}
 	return n;
-}
-
-size_t
-vc_getprojects(struct project *project)
-{
-	return jsonprojects(project);
-}
-
-const char *
-licensestr(enum license l)
-{
-	const char *result;
-	switch (l) {
-	case ISC:
-		result = "ISC";
-	break;
-	case MIT:
-		result = "MIT";
-	break;
-	case GPL3:
-		result = "GPL3";
-	break;
-	default:
-		result = "None";
-	}
-	return result;
-}
-
-const char *
-languagestr(enum language l)
-{
-	const char *result;
-	switch (l) {
-	case C:
-		result = "C";
-	break;
-	case HTML_:
-		result = "HTML";
-	break;
-	case SHELL:
-		result = "Shell";
-	break;
-	case MAKEFILE:
-		result = "Makefile";
-	break;
-	case EMACSLISP:
-		result = "Elisp";
-	break;
-	default:
-		result = "Unknown";
-	}
-	return result;
 }
 
