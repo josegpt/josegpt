@@ -229,7 +229,7 @@ main(void)
 	html_endnav(&html);
 	html_endheader(&html);
 
-	n = vc_get(projects);
+	n = vc_getprojects(projects);
 	if (n > 0) {
 		html_beginmain(&html);
 		html_beginclass(&html);

@@ -41,9 +41,7 @@ struct project {
 	enum language language;
 };
 
-#include "github.h"
-
-size_t      vc_get(struct project *);
+size_t      vc_getprojects(struct project *);
 const char *vc_licensestr(enum license);
 const char *vc_languagestr(enum language);
 

@@ -14,13 +14,90 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <json.h>
+#include <string.h>
+
 #include "vc.h"
-#include "github.c"
+
+static enum license
+strlicense(const char *str)
+{
+	enum license result;
+	if      (strcmp("ISC", str) == 0)     result = ISC;
+	else if (strcmp("MIT", str) == 0)     result = MIT;
+	else if (strcmp("GPL-3.0", str) == 0) result = GPL3;
+	else                                  result = NONE;
+	return result;
+}
+
+static enum language
+strlanguage(const char *str)
+{
+	enum language result;
+	if      (strcmp("C", str) == 0)          result = C;
+	else if (strcmp("HTML", str) == 0)       result = HTML_;
+	else if (strcmp("Shell", str) == 0)      result = SHELL;
+	else if (strcmp("Makefile", str) == 0)   result = MAKEFILE;
+	else if (strcmp("Emacs Lisp", str) == 0) result = EMACSLISP;
+	else                                     result = UNKNOWN;
+	return result;
+}
+
+static size_t
+jsonprojects(struct project *projects)
+{
+	struct json_object *jsonp, *project, *name, *description, *url;
+	struct json_object *license, *spdxid, *language;
+	struct project     *pp;
+	const char         *str;
+	size_t              i, n;
+
+	jsonp = json_object_from_file("/cache/projects.json");
+	if (jsonp) {
+		n = json_object_array_length(jsonp);
+		for (i = 0, pp = projects; i < n; ++i, ++pp) {
+			project = json_object_array_get_idx(jsonp, i);
+			if (json_object_object_get_ex(project, "name", &name)) {
+				str = json_object_get_string(name);
+				if (str) pp->name = strdup(str);
+			}
+
+			if (json_object_object_get_ex(project, "description", &description)) {
+				str = json_object_get_string(description);
+				if (str) pp->description = strdup(str);
+			}
+
+			if (json_object_object_get_ex(project, "html_url", &url)) {
+				str = json_object_get_string(url);
+				if (str) pp->url = strdup(str);
+			}
+
+			if (json_object_object_get_ex(project, "license", &license)) {
+				if (json_object_object_get_ex(license, "spdx_id", &spdxid)) {
+					str = json_object_get_string(spdxid);
+					if (str) pp->license = strlicense(str);
+					else     pp->license = NONE;
+				}
+			}
+
+			if (json_object_object_get_ex(project, "language", &language)) {
+				str = json_object_get_string(language);
+				if (str) pp->language = strlanguage(str);
+				else     pp->language = UNKNOWN;
+			}
+		}
+		json_object_put(jsonp);
+		jsonp = NULL;
+	} else {
+		n = 0;
+	}
+	return n;
+}
 
 size_t
-vc_get(struct project *project)
+vc_getprojects(struct project *project)
 {
-	return github_get(project);
+	return jsonprojects(project);
 }
 
 const char *
@@ -68,3 +145,4 @@ languagestr(enum language l)
 	}
 	return result;
 }
+
