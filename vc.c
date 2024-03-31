@@ -141,7 +141,7 @@ jsonprojects(struct project *projects)
 
 		json_object_object_get_ex(project, "name", &name);
 		json_object_object_get_ex(project, "description", &desc);
-		json_object_object_get_ex(project, "url", &url);
+		json_object_object_get_ex(project, "html_url", &url);
 		json_object_object_get_ex(project, "license", &license);
 		json_object_object_get_ex(project, "language", &language);
 
