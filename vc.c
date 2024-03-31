@@ -45,6 +45,7 @@ static struct languagerow languagetable[] = {
 	{"Shell",      "shell",    SHELL},
 	{"Makefile",   "makefile", MAKEFILE},
 	{"Emacs Lisp", "elisp",    EMACSLISP},
+	{"Vue",        "js",       JAVASCRIPT},
 };
 
 static enum license  strlicense(const char *);

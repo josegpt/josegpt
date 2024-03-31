@@ -30,7 +30,8 @@ enum language {
 	HTML_,
 	SHELL,
 	MAKEFILE,
-	EMACSLISP
+	EMACSLISP,
+	JAVASCRIPT
 };
 
 struct project {
