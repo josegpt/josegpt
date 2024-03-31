@@ -22,7 +22,7 @@ josegpt: josegpt.o
 	${CC} -o $@ ${LDFLAGS} $?
 
 clean:
-	rm -rf *.o *.core josegpt
+	rm -rf *.o *.core ktrace.out josegpt
 
 install: all
 	mkdir -p ${CGIDIR} ${HTDOCSDIR}
