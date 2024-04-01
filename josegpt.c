@@ -14,6 +14,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <sys/queue.h>
+
 #include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,14 +26,13 @@
 
 #include "vc.c"
 
-static struct project projects[32];
+static struct portfolio head = SIMPLEQ_HEAD_INITIALIZER(head);
 
 int
 main(void)
 {
 	struct html     html;
-	struct project *pp;
-	int             n;
+	struct project *p;
 
 	if (pledge("stdio rpath", NULL) == -1)
 		err(EXIT_FAILURE, "pledge");
@@ -229,49 +230,7 @@ main(void)
 	html_endnav(&html);
 	html_endheader(&html);
 
-	n = getprojects(projects);
-	if (n > 0) {
-		html_beginmain(&html);
-		html_beginclass(&html);
-		html_text(&html, "stack");
-		html_endclass(&html);
-
-		for (pp = projects; pp->name; ++pp) {
-			html_beginarticle(&html);
-			html_beginh2(&html);
-			html_beginanchor(&html);
-
-			html_beginhref(&html);
-			html_text(&html, pp->url);
-			html_endhref(&html);
-			html_begintarget(&html);
-			html_text(&html, "_blank");
-			html_endtarget(&html);
-			html_beginrel(&html);
-			html_text(&html, "noopener");
-			html_text(&html, "noreferrer");
-			html_endrel(&html);
-			html_text(&html, pp->name);
-
-			html_endanchor(&html);
-			html_endh2(&html);
-
-			html_beginp(&html);
-			html_text(&html, pp->desc);
-			html_endp(&html);
-
-			html_beginfooter(&html);
-			html_beginem(&html);
-			html_text(&html, "%s@%s", langtostr(pp->lang), lictostr(pp->lic));
-			html_endem(&html);
-			html_endfooter(&html);
-			html_endarticle(&html);
-
-			unrefproject(pp);
-		}
-
-		html_endmain(&html);
-	} else {
+	if (getprojects(&head)) {
 		html_beginmain(&html);
 		html_beginclass(&html);
 		html_text(&html, "cluster");
@@ -295,6 +254,50 @@ main(void)
 		html_endh1(&html);
 
 		html_endsection(&html);
+		html_endmain(&html);
+	} else {
+		html_beginmain(&html);
+		html_beginclass(&html);
+		html_text(&html, "stack");
+		html_endclass(&html);
+
+		while (!SIMPLEQ_EMPTY(&head)) {
+			p = SIMPLEQ_FIRST(&head);
+
+			html_beginarticle(&html);
+			html_beginh2(&html);
+			html_beginanchor(&html);
+
+			html_beginhref(&html);
+			html_text(&html, p->url);
+			html_endhref(&html);
+			html_begintarget(&html);
+			html_text(&html, "_blank");
+			html_endtarget(&html);
+			html_beginrel(&html);
+			html_text(&html, "noopener");
+			html_text(&html, "noreferrer");
+			html_endrel(&html);
+			html_text(&html, p->name);
+
+			html_endanchor(&html);
+			html_endh2(&html);
+
+			html_beginp(&html);
+			html_text(&html, p->desc);
+			html_endp(&html);
+
+			html_beginfooter(&html);
+			html_beginem(&html);
+			html_text(&html, "%s@%s", langtostr(p->lang), lictostr(p->lic));
+			html_endem(&html);
+			html_endfooter(&html);
+			html_endarticle(&html);
+
+			SIMPLEQ_REMOVE_HEAD(&head, projects);
+			freeproject(p);
+		}
+
 		html_endmain(&html);
 	}
 

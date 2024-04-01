@@ -42,20 +42,56 @@ static struct {
 	{"Vue",        JAVASCRIPT}
 };
 
-static int jsontoprojects(struct project *);
+static enum lic  strtolic(const char *);
+static enum lang strtolang(const char *);
 
 int
-getprojects(struct project *pp)
+getprojects(struct portfolio *pp)
 {
-	return jsontoprojects(pp);
+	struct json_object *json, *o, *name, *desc, *url;
+	struct json_object *lic, *lang, *spdx;
+	struct project     *p;
+	int                 i, n;
+
+	json = json_object_from_file("projects.json");
+	if (json) {
+		n = json_object_array_length(json);
+		for (i = 0; i < n; ++i) {
+			o = json_object_array_get_idx(json, i);
+
+			json_object_object_get_ex(o, "name", &name);
+			json_object_object_get_ex(o, "description", &desc);
+			json_object_object_get_ex(o, "html_url", &url);
+			json_object_object_get_ex(o, "license", &lic);
+			json_object_object_get_ex(o, "language", &lang);
+
+			json_object_object_get_ex(lic, "spdx_id", &spdx);
+
+			p = malloc(sizeof(struct project));
+			p->name = strdup(name ? json_object_get_string(name) : "noname");
+			p->desc = strdup(desc ? json_object_get_string(desc) : "nodescription");
+			p->url  = strdup(url ? json_object_get_string(url) : "nourl");
+			p->lic  = spdx ? strtolic(json_object_get_string(spdx)) : NONE;
+			p->lang = lang ? strtolang(json_object_get_string(lang)) : UNKNOWN;
+
+			SIMPLEQ_INSERT_TAIL(pp, p, projects);
+		}
+
+		json_object_put(json);
+		json = NULL;
+	}
+
+	return SIMPLEQ_EMPTY(pp);
 }
 
+
 void
-unrefproject(struct project *p)
+freeproject(struct project *p)
 {
 	free(p->name);
 	free(p->desc);
 	free(p->url);
+	free(p);
 }
 
 const char *
@@ -132,40 +168,3 @@ strtolang(const char *str)
 	}
 	return (UNKNOWN);
 }
-
-static int
-jsontoprojects(struct project *pp)
-{
-	struct json_object *json, *o, *name, *desc, *url;
-	struct json_object *lic, *lang, *spdx;
-	struct project     *p;
-	int                 i, count;
-
-	count = 0;
-	json = json_object_from_file("/cache/projects.json");
-	if (json) {
-		count = json_object_array_length(json);
-		for (i = 0, p = pp; i < count; ++i, ++pp) {
-			o = json_object_array_get_idx(json, i);
-
-			json_object_object_get_ex(o, "name", &name);
-			json_object_object_get_ex(o, "description", &desc);
-			json_object_object_get_ex(o, "html_url", &url);
-			json_object_object_get_ex(o, "license", &lic);
-			json_object_object_get_ex(o, "language", &lang);
-
-			json_object_object_get_ex(lic, "spdx_id", &spdx);
-
-			pp->name = strdup(name ? json_object_get_string(name) : "noname");
-			pp->desc = strdup(desc ? json_object_get_string(desc) : "nodescription");
-			pp->url  = strdup(url ? json_object_get_string(url) : "nourl");
-			pp->lic  = spdx ? strtolic(json_object_get_string(spdx)) : NONE;
-			pp->lang = lang ? strtolang(json_object_get_string(lang)) : UNKNOWN;
-		}
-
-		json_object_put(json);
-		json = NULL;
-	}
-	return (count);
-}
-

@@ -17,6 +17,8 @@
 #ifndef VC_H
 #define VC_H
 
+#include <sys/queue.h>
+
 enum lic {
 	NONE,
 	ISC,
@@ -35,15 +37,18 @@ enum lang {
 };
 
 struct project {
-	char     *name;
-	char     *desc;
-	char     *url;
-	enum lic  lic;
-	enum lang lang;
+	char                  *name;
+	char                  *desc;
+	char                  *url;
+	enum lic               lic;
+	enum lang              lang;
+	SIMPLEQ_ENTRY(project) projects;
 };
 
-int         getprojects(struct project *);
-void        unrefproject(struct project *);
+SIMPLEQ_HEAD(portfolio, project);
+
+int         getprojects(struct portfolio *);
+void        freeproject(struct project *);
 const char *lictostr(enum lic);
 const char *langtostr(enum lang);
 
