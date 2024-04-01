@@ -17,16 +17,50 @@
 #include <sys/queue.h>
 
 #include <err.h>
+#include <json.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #define HTML_IMPLEMENTATION
 #include "html.h"
+#include "josegpt.h"
 
-#include "vc.c"
+static SIMPLEQ_HEAD(portfolio, project) head = SIMPLEQ_HEAD_INITIALIZER(head);
 
-static struct portfolio head = SIMPLEQ_HEAD_INITIALIZER(head);
+static const char *licstr[] = {
+	"isc", "mit", "gpl3", "none"
+};
+
+static const char *langstr[] = {
+	"c", "html", "shell", "unknown",
+	"makefile", "elisp", "js"
+};
+
+static struct {
+	const char *from;
+	enum lic    to;
+} lictable[] = {
+	{"ISC",     ISC},
+	{"MIT",     MIT},
+	{"GPL-3.0", GPL3}
+};
+
+static struct {
+	const char *from;
+	enum lang   to;
+} langtable[] = {
+	{"C",          C},
+	{"HTML",       HTML_},
+	{"Shell",      SHELL},
+	{"Makefile",   MAKEFILE},
+	{"Emacs Lisp", EMACSLISP},
+	{"Vue",        JAVASCRIPT}
+};
+
+static enum lic  strtolic(const char *);
+static enum lang strtolang(const char *);
 
 int
 main(void)
@@ -233,37 +267,10 @@ main(void)
 	if (getprojects(&head)) {
 		html_beginmain(&html);
 		html_beginclass(&html);
-		html_text(&html, "cluster");
-		html_endclass(&html);
-
-		html_begindata(&html, "justify");
-		html_text(&html, "center");
-		html_enddata(&html);
-
-		html_begindata(&html, "align");
-		html_text(&html, "center");
-		html_enddata(&html);
-
-		html_beginsection(&html);
-		html_beginclass(&html);
-		html_text(&html, "text-align:center");
-		html_endclass(&html);
-
-		html_beginh1(&html);
-		html_text(&html, "No Projects Found");
-		html_endh1(&html);
-
-		html_endsection(&html);
-		html_endmain(&html);
-	} else {
-		html_beginmain(&html);
-		html_beginclass(&html);
 		html_text(&html, "stack");
 		html_endclass(&html);
 
-		while (!SIMPLEQ_EMPTY(&head)) {
-			p = SIMPLEQ_FIRST(&head);
-
+		while ((p = SIMPLEQ_FIRST(&head))) {
 			html_beginarticle(&html);
 			html_beginh2(&html);
 			html_beginanchor(&html);
@@ -298,6 +305,31 @@ main(void)
 			freeproject(p);
 		}
 
+		html_endmain(&html);
+	} else {
+		html_beginmain(&html);
+		html_beginclass(&html);
+		html_text(&html, "cluster");
+		html_endclass(&html);
+
+		html_begindata(&html, "justify");
+		html_text(&html, "center");
+		html_enddata(&html);
+
+		html_begindata(&html, "align");
+		html_text(&html, "center");
+		html_enddata(&html);
+
+		html_beginsection(&html);
+		html_beginclass(&html);
+		html_text(&html, "text-align:center");
+		html_endclass(&html);
+
+		html_beginh1(&html);
+		html_text(&html, "No Projects Found");
+		html_endh1(&html);
+
+		html_endsection(&html);
 		html_endmain(&html);
 	}
 
@@ -378,4 +410,108 @@ main(void)
 	html_end(&html);
 
 	return (EXIT_SUCCESS);
+}
+
+int
+getprojects(struct portfolio *pp)
+{
+	struct json_object *json, *o, *name, *desc, *url;
+	struct json_object *lic, *lang, *spdx;
+	struct project     *p;
+	const char         *filename;
+	int                 i, n, result;
+
+	filename = "/cache/projects.json";
+	json = json_object_from_file(filename);
+	if (json) {
+		n = json_object_array_length(json);
+		for (i = 0; i < n; ++i) {
+			o = json_object_array_get_idx(json, i);
+
+			json_object_object_get_ex(o, "name", &name);
+			json_object_object_get_ex(o, "description", &desc);
+			json_object_object_get_ex(o, "html_url", &url);
+			json_object_object_get_ex(o, "license", &lic);
+			json_object_object_get_ex(o, "language", &lang);
+
+			json_object_object_get_ex(lic, "spdx_id", &spdx);
+
+			p = (struct project *)malloc(sizeof(struct project));
+			if (p) {
+				p->name = strdup(name ? json_object_get_string(name) : "noname");
+				p->desc = strdup(desc ? json_object_get_string(desc) : "nodescription");
+				p->url  = strdup(url ? json_object_get_string(url) : "nourl");
+				p->lic  = spdx ? strtolic(json_object_get_string(spdx)) : NONE;
+				p->lang = lang ? strtolang(json_object_get_string(lang)) : UNKNOWN;
+
+				SIMPLEQ_INSERT_TAIL(pp, p, projects);
+			} else {
+				warn(NULL);
+				result = 0;
+				break;
+			}
+		}
+		json_object_put(json);
+		json = NULL;
+		result = !SIMPLEQ_EMPTY(pp);
+	} else {
+		warn("could not read %s", filename);
+		result = 0;
+	}
+	return (result);
+}
+
+
+void
+freeproject(struct project *p)
+{
+	free(p->name);
+	free(p->desc);
+	free(p->url);
+	free(p);
+	p = NULL;
+}
+
+const char *
+lictostr(enum lic l)
+{
+	return (licstr[l]);
+}
+
+const char *
+langtostr(enum lang l)
+{
+	return (langstr[l]);
+}
+
+static enum lic
+strtolic(const char *str)
+{
+	enum lic result;
+	int i;
+
+	result = NONE;
+	for (i = 0; i < (int)nitems(lictable); ++i) {
+		if (strcmp(lictable[i].from, str) == 0) {
+			result = lictable[i].to;
+			break;
+		}
+	}
+	return (result);
+}
+
+static enum lang
+strtolang(const char *str)
+{
+	enum lang result;
+	int i;
+
+	result = UNKNOWN;
+	for (i = 0; i < (int)nitems(langtable); ++i) {
+		if (strcmp(langtable[i].from, str) == 0) {
+			result = langtable[i].to;
+			break;
+		}
+	}
+	return (result);
 }

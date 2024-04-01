@@ -14,23 +14,25 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef VC_H
-#define VC_H
+#ifndef _JOSEGPT_H_
+#define _JOSEGPT_H_
 
 #include <sys/queue.h>
 
+#define nitems(aa) (sizeof(aa) / sizeof(aa[0]))
+
 enum lic {
-	NONE,
 	ISC,
 	MIT,
-	GPL3
+	GPL3,
+	NONE,
 };
 
 enum lang {
-	UNKNOWN,
 	C,
 	HTML_,
 	SHELL,
+	UNKNOWN,
 	MAKEFILE,
 	EMACSLISP,
 	JAVASCRIPT
@@ -45,11 +47,11 @@ struct project {
 	SIMPLEQ_ENTRY(project) projects;
 };
 
-SIMPLEQ_HEAD(portfolio, project);
+struct portfolio;
 
 int         getprojects(struct portfolio *);
 void        freeproject(struct project *);
 const char *lictostr(enum lic);
 const char *langtostr(enum lang);
 
-#endif /* VC_H */
+#endif /* _JOSEGPT_H_ */
