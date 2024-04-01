@@ -17,14 +17,14 @@
 #ifndef VC_H
 #define VC_H
 
-enum license {
+enum lic {
 	NONE,
 	ISC,
 	MIT,
 	GPL3
 };
 
-enum language {
+enum lang {
 	UNKNOWN,
 	C,
 	HTML_,
@@ -35,16 +35,16 @@ enum language {
 };
 
 struct project {
-	char         *name;
-	char         *description;
-	char         *url;
-	enum license  license;
-	enum language language;
+	char     *name;
+	char     *desc;
+	char     *url;
+	enum lic  lic;
+	enum lang lang;
 };
 
-size_t      vc_getprojects(struct project *);
-void        vc_unrefproject(struct project *);
-const char *vc_licensestr(enum license);
-const char *vc_languagestr(enum language);
+int         getprojects(struct project *);
+void        unrefproject(struct project *);
+const char *lictostr(enum lic);
+const char *langtostr(enum lang);
 
 #endif /* VC_H */

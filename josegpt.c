@@ -31,7 +31,7 @@ main(void)
 {
 	struct html     html;
 	struct project *pp;
-	size_t          n;
+	int             n;
 
 	if (pledge("stdio rpath", NULL) == -1)
 		err(EXIT_FAILURE, "pledge");
@@ -229,7 +229,7 @@ main(void)
 	html_endnav(&html);
 	html_endheader(&html);
 
-	n = vc_getprojects(projects);
+	n = getprojects(projects);
 	if (n > 0) {
 		html_beginmain(&html);
 		html_beginclass(&html);
@@ -257,17 +257,17 @@ main(void)
 			html_endh2(&html);
 
 			html_beginp(&html);
-			html_text(&html, pp->description);
+			html_text(&html, pp->desc);
 			html_endp(&html);
 
 			html_beginfooter(&html);
 			html_beginem(&html);
-			html_text(&html, "%s@%s", languagestr(pp->language), licensestr(pp->license));
+			html_text(&html, "%s@%s", langtostr(pp->lang), lictostr(pp->lic));
 			html_endem(&html);
 			html_endfooter(&html);
 			html_endarticle(&html);
 
-			vc_unrefproject(pp);
+			unrefproject(pp);
 		}
 
 		html_endmain(&html);
@@ -374,5 +374,5 @@ main(void)
 	html_endbody(&html);
 	html_end(&html);
 
-	return EXIT_SUCCESS;
+	return (EXIT_SUCCESS);
 }

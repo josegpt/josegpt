@@ -21,143 +21,155 @@
 
 #define nitems(aa) (sizeof(aa) / sizeof(aa[0]))
 
-struct licenserow {
-	const char  *from;
-	const char  *to;
-	enum license license;
+struct licconv {
+	const char *from;
+	enum lic    to;
 };
 
-struct languagerow {
-	const char   *from;
-	const char   *to;
-	enum language language;
+struct langconv {
+	const char *from;
+	enum lang   to;
 };
 
-static struct licenserow licensetable[] = {
-	{"ISC",     "isc",  ISC},
-	{"MIT",     "mit",  MIT},
-	{"GPL-3.0", "gpl3", GPL3},
+static struct licconv lictable[] = {
+	{"ISC",     ISC},
+	{"MIT",     MIT},
+	{"GPL-3.0", GPL3}
 };
 
-static struct languagerow languagetable[] = {
-	{"C",          "c",        C},
-	{"HTML",       "html",     HTML_},
-	{"Shell",      "shell",    SHELL},
-	{"Makefile",   "makefile", MAKEFILE},
-	{"Emacs Lisp", "elisp",    EMACSLISP},
-	{"Vue",        "js",       JAVASCRIPT},
+static struct langconv langtable[] = {
+	{"C",          C},
+	{"HTML",       HTML_},
+	{"Shell",      SHELL},
+	{"Makefile",   MAKEFILE},
+	{"Emacs Lisp", EMACSLISP},
+	{"Vue",        JAVASCRIPT}
 };
 
-static enum license  strlicense(const char *);
-static enum language strlanguage(const char *);
-static size_t        jsonprojects(struct project *);
+static int jsontoprojects(struct project *);
 
-size_t
-vc_getprojects(struct project *project)
+int
+getprojects(struct project *pp)
 {
-	return jsonprojects(project);
+	return jsontoprojects(pp);
 }
 
 void
-vc_unrefproject(struct project *project)
+unrefproject(struct project *p)
 {
-	if (project) {
-		free(project->name);
-		free(project->description);
-		free(project->url);
-	}
+	free(p->name);
+	free(p->desc);
+	free(p->url);
 }
 
-static const char *
-licensestr(enum license a)
+const char *
+lictostr(enum lic l)
 {
-	struct licenserow b;
-	size_t i;
+	char *result;
 
-	for (i = 0; i < nitems(licensetable); ++i) {
-		b = licensetable[i];
-		if (b.license == a)
-			return (b.to);
+	switch (l) {
+	case ISC:
+		result = "isc";
+		break;
+	case MIT:
+		result = "mit";
+		break;
+	case GPL3:
+		result = "gpl3";
+		break;
+	default:
+		result = "none";
 	}
-	return ("None");
+	return (result);
 }
 
-static const char *
-languagestr(enum language a)
+const char *
+langtostr(enum lang l)
 {
-	struct languagerow b;
-	size_t i;
+	char *result;
 
-	for (i = 0; i < nitems(languagetable); ++i) {
-		b = languagetable[i];
-		if (b.language == a)
-			return (b.to);
+	switch (l) {
+	case C:
+		result = "c";
+		break;
+	case HTML_:
+		result = "html";
+		break;
+	case SHELL:
+		result = "shell";
+		break;
+	case MAKEFILE:
+		result = "makefile";
+		break;
+	case EMACSLISP:
+		result = "elisp";
+		break;
+	case JAVASCRIPT:
+		result = "js";
+		break;
+	default:
+		result = "unknown";
 	}
-	return ("Unknown");
+	return (result);
 }
 
-static enum license
-strlicense(const char *str)
+static enum lic
+strtolic(const char *str)
 {
-	struct licenserow l;
-	size_t i;
+	int i;
 
-	for (i = 0; i < nitems(licensetable); ++i) {
-		l = licensetable[i];
-		if (strcmp(l.from, str) == 0)
-			return (l.license);
+	for (i = 0; i < (int)nitems(lictable); ++i) {
+		if (strcmp(lictable[i].from, str) == 0)
+			return (lictable[i].to);
 	}
 	return (NONE);
 }
 
-static enum language
-strlanguage(const char *str)
+static enum lang
+strtolang(const char *str)
 {
-	struct languagerow l;
-	size_t i;
+	int i;
 
-	for (i = 0; i < nitems(languagetable); ++i) {
-		l = languagetable[i];
-		if (strcmp(l.from, str) == 0)
-			return (l.language);
+	for (i = 0; i < (int)nitems(langtable); ++i) {
+		if (strcmp(langtable[i].from, str) == 0)
+			return (langtable[i].to);
 	}
 	return (UNKNOWN);
 }
 
-static size_t
-jsonprojects(struct project *projects)
+static int
+jsontoprojects(struct project *pp)
 {
-	struct json_object *jsonp, *project, *name, *desc, *url;
-	struct json_object *license, *spdxid, *language;
-	struct project     *pp;
-	size_t              i, n;
+	struct json_object *json, *o, *name, *desc, *url;
+	struct json_object *lic, *lang, *spdx;
+	struct project     *p;
+	int                 i, count;
 
-	jsonp = json_object_from_file("/cache/projects.json");
-	if (jsonp == NULL)
-		return (0);
+	count = 0;
+	json = json_object_from_file("/cache/projects.json");
+	if (json) {
+		count = json_object_array_length(json);
+		for (i = 0, p = pp; i < count; ++i, ++pp) {
+			o = json_object_array_get_idx(json, i);
 
-	n = json_object_array_length(jsonp);
-	for (i = 0, pp = projects; i < n; ++i, ++pp) {
-		project = json_object_array_get_idx(jsonp, i);
+			json_object_object_get_ex(o, "name", &name);
+			json_object_object_get_ex(o, "description", &desc);
+			json_object_object_get_ex(o, "html_url", &url);
+			json_object_object_get_ex(o, "license", &lic);
+			json_object_object_get_ex(o, "language", &lang);
 
-		json_object_object_get_ex(project, "name", &name);
-		json_object_object_get_ex(project, "description", &desc);
-		json_object_object_get_ex(project, "html_url", &url);
-		json_object_object_get_ex(project, "license", &license);
-		json_object_object_get_ex(project, "language", &language);
+			json_object_object_get_ex(lic, "spdx_id", &spdx);
 
-		json_object_object_get_ex(license, "spdx_id", &spdxid);
+			pp->name = strdup(name ? json_object_get_string(name) : "noname");
+			pp->desc = strdup(desc ? json_object_get_string(desc) : "nodescription");
+			pp->url  = strdup(url ? json_object_get_string(url) : "nourl");
+			pp->lic  = spdx ? strtolic(json_object_get_string(spdx)) : NONE;
+			pp->lang = lang ? strtolang(json_object_get_string(lang)) : UNKNOWN;
+		}
 
-		pp->name = strdup(name ? json_object_get_string(name) : "noname");
-		pp->description = strdup(desc ? json_object_get_string(desc) : "nodescription");
-		pp->url = strdup(url ? json_object_get_string(url) : "nourl");
-		pp->license = spdxid ? strlicense(json_object_get_string(spdxid)) : NONE;
-		pp->language = language ? strlanguage(json_object_get_string(language)) : UNKNOWN;
+		json_object_put(json);
+		json = NULL;
 	}
-
-	json_object_put(jsonp);
-	jsonp = NULL;
-
-	return (n);
+	return (count);
 }
 
