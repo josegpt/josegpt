@@ -21,23 +21,19 @@
 
 #define nitems(aa) (sizeof(aa) / sizeof(aa[0]))
 
-struct licconv {
+static struct {
 	const char *from;
 	enum lic    to;
-};
-
-struct langconv {
-	const char *from;
-	enum lang   to;
-};
-
-static struct licconv lictable[] = {
+} lictable[] = {
 	{"ISC",     ISC},
 	{"MIT",     MIT},
 	{"GPL-3.0", GPL3}
 };
 
-static struct langconv langtable[] = {
+static struct {
+	const char *from;
+	enum lang   to;
+} langtable[] = {
 	{"C",          C},
 	{"HTML",       HTML_},
 	{"Shell",      SHELL},
