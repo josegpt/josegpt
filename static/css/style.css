@@ -21,14 +21,15 @@ html {
 	--secondary-color: #000000;
 	--tertiary-color: #eeeeee;
 	--accent-color: #ff0000;
-	--link-color: #1e90ff;
+	--link-color: #0000ff;
 }
 
 @media only screen and (prefers-color-scheme: dark) {
 	:root {
 		--primary-color: #000000;
-		--secondary-color: #ffffff;
+		--secondary-color: #bdbdbd;
 		--tertiary-color: #333333;
+		--link-color: #56c8ff;
 	}
 }
 
