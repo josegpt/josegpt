@@ -17,21 +17,22 @@ html {
 }
 
 :root {
-	--primary-color: white;
-	--secondary-color: black;
-	--accent-color: red;
-	--link-color: dodgerblue;
+	--primary-color: #ffffff;
+	--secondary-color: #000000;
+	--tertiary-color: #eeeeee;
+	--accent-color: #ff0000;
+	--link-color: #1e90ff;
 }
 
 @media only screen and (prefers-color-scheme: dark) {
 	:root {
-		--primary-color: black;
-		--secondary-color: white;
+		--primary-color: #000000;
+		--secondary-color: #ffffff;
+		--tertiary-color: #333333;
 	}
 }
 
 body {
-	font-family: monospace;
 	line-height: 1.6;
 	max-width: 80ch;
 	margin-inline: auto;
@@ -67,6 +68,17 @@ a:visited {
 a:focus,
 a:hover {
 	text-decoration: underline;
+}
+
+code {
+	background-color: var(--tertiary-color);
+	padding: .1rem .3rem;
+	border-radius: .2rem;
+	overflow: auto;
+}
+
+ul {
+	list-style: square inside;
 }
 
 body {
