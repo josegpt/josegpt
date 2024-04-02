@@ -34,6 +34,7 @@ html {
 }
 
 body {
+	font-family: monospace;
 	line-height: 1.6;
 	max-width: 80ch;
 	margin-inline: auto;
