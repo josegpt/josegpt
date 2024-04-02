@@ -140,9 +140,9 @@ binsearch(const char *w, struct conv *cc)
 		else if (cond > 0)
 			low = mid + 1;
 		else
-			return mid;
+			return (mid);
 	}
-	return -1;
+	return (-1);
 }
 
 int
