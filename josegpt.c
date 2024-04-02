@@ -159,7 +159,6 @@ estrdup(const char *s)
 	return (p);
 }
 
-
 int
 main(void)
 {
@@ -470,16 +469,8 @@ main(void)
 
 	html_beginp(&html);
 	html_beginclass(&html);
-	html_text(&html, "cluster");
+	html_text(&html, "text-align:center");
 	html_endclass(&html);
-
-	html_begindata(&html, "justify");
-	html_text(&html, "center");
-	html_enddata(&html);
-
-	html_begindata(&html, "align");
-	html_text(&html, "center");
-	html_enddata(&html);
 
 	html_beginsmall(&html);
 	html_text(&html, "&copy2017 ");
