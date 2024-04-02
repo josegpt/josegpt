@@ -14,8 +14,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <sys/queue.h>
-
 #include <err.h>
 #include <json.h>
 #include <stdio.h>
@@ -26,14 +24,13 @@
 #define HTML_IMPLEMENTATION
 #include "html.h"
 
-SIMPLEQ_HEAD(projecthead, project);
 struct project {
-	char	              *name;
-	char	              *desc;
-	char	              *url;
-	char	              *lic;
-	char	              *lang;
-	SIMPLEQ_ENTRY(project) projects;
+	char		*name;
+	char		*desc;
+	char		*url;
+	char		*lic;
+	char		*lang;
+	struct project	*next;
 };
 
 struct conv {
@@ -41,11 +38,14 @@ struct conv {
 	const char	*to;
 };
 
-int	getprojects(void);
-void	freeproject(struct project *);
-int	binsearch(const char *, struct conv *);
+void		 getpp(void);
+struct project	*createp(char *, char *, char *, char *, char *);
+void		 destroyp(struct project *);
+const char	*map(const char *);
+void		*ecalloc(size_t, size_t);
+char		*estrdup(const char *);
 
-static struct projecthead head = SIMPLEQ_HEAD_INITIALIZER(head);
+static struct project *pp, **ppt = &pp;
 
 static struct conv convs[] = {
 	{"C",           "c"},
@@ -60,14 +60,14 @@ static struct conv convs[] = {
 	{"Vue",         "js"},
 };
 
-int
-getprojects(void)
+void
+getpp(void)
 {
 	struct json_object *json, *o, *name, *desc, *url;
 	struct json_object *lic, *lang, *spdx;
 	struct project     *p;
 	const char         *filename;
-	int                 i, m, n, result;
+	int                 i, n;
 
 	filename = "/cache/projects.json";
 	json = json_object_from_file(filename);
@@ -75,47 +75,42 @@ getprojects(void)
 		n = json_object_array_length(json);
 		for (i = 0; i < n; ++i) {
 			o = json_object_array_get_idx(json, i);
-
 			json_object_object_get_ex(o, "name", &name);
 			json_object_object_get_ex(o, "description", &desc);
 			json_object_object_get_ex(o, "html_url", &url);
 			json_object_object_get_ex(o, "license", &lic);
 			json_object_object_get_ex(o, "language", &lang);
-
 			json_object_object_get_ex(lic, "spdx_id", &spdx);
-
-			p = malloc(sizeof(struct project));
-			if (p) {
-				p->name = strdup(name ? json_object_get_string(name) : "noname");
-				p->desc = strdup(desc ? json_object_get_string(desc) : "nodescription");
-				p->url  = strdup(url ? json_object_get_string(url) : "nourl");
-
-				m = binsearch(spdx ? json_object_get_string(spdx) : "", convs);
-				p->lic = strdup(m == -1 ? "none" : (convs + m)->to);
-
-				m = binsearch(lang ? json_object_get_string(lang) : "", convs);
-				p->lang = strdup(m == -1 ? "unknown" : (convs + m)->to);
-
-				SIMPLEQ_INSERT_TAIL(&head, p, projects);
-			} else {
-				warn(NULL);
-				result = 0;
-				break;
-			}
+			p = createp((char *)json_object_get_string(name),
+			    (char *)json_object_get_string(desc),
+			    (char *)json_object_get_string(url),
+			    (char *)(spdx ? json_object_get_string(spdx) : ""),
+			    (char *)json_object_get_string(lang));
+			*ppt = p;
+			ppt = &p->next;
 		}
 		json_object_put(json);
-		json = NULL;
-		result = !SIMPLEQ_EMPTY(&head);
-	} else {
+	} else
 		warn("could not read %s", filename);
-		result = 0;
-	}
-	return (result);
 }
 
+struct project *
+createp(char *name, char *desc, char *url, char *lic, char *lang)
+{
+	struct project *p;
+	char *s;
+
+	p = ecalloc(1, sizeof(struct project));
+	p->name = estrdup(name);
+	p->desc = estrdup(desc);
+	p->url  = estrdup(url);
+	p->lic  = estrdup((s = (char *)map(lic)) ? s : "none");
+	p->lang = estrdup((s = (char *)map(lang)) ? s : "unknown");
+	return (p);
+}
 
 void
-freeproject(struct project *p)
+destroyp(struct project *p)
 {
 	free(p->name);
 	free(p->desc);
@@ -123,11 +118,10 @@ freeproject(struct project *p)
 	free(p->lic);
 	free(p->lang);
 	free(p);
-	p = NULL;
 }
 
-int
-binsearch(const char *w, struct conv *cc)
+const char *
+map(const char *w)
 {
 	int cond, high, mid, low;
 
@@ -135,33 +129,54 @@ binsearch(const char *w, struct conv *cc)
 	high = sizeof(convs) / sizeof(convs[0]) - 1;
 	while (low <= high) {
 		mid = (low + high) / 2;
-		if ((cond = strcmp(w, cc[mid].from)) < 0)
+		if ((cond = strcmp(w, convs[mid].from)) < 0)
 			high = mid - 1;
 		else if (cond > 0)
 			low = mid + 1;
 		else
-			return (mid);
+			return ((convs + mid)->to);
 	}
-	return (-1);
+	return (NULL);
 }
+
+void *
+ecalloc(size_t nmemb, size_t size)
+{
+	void *p;
+
+	if ((p = calloc(nmemb, size)) == NULL)
+		err(1, NULL);
+	return (p);
+}
+
+char *
+estrdup(const char *s)
+{
+	char *p;
+
+	if ((p = strdup(s)) == NULL)
+		err(1, NULL);
+	return (p);
+}
+
 
 int
 main(void)
 {
 	struct html	 html;
-	struct project	*p;
+	struct project	*p, *t;
 
 	if (pledge("stdio rpath", NULL) == -1)
 		err(EXIT_FAILURE, "pledge");
+
+	getpp();
 
 	puts("Status: 200 OK\r");
 	puts("Content-Type: text/html\r");
 	puts("\r");
 
 	html_begin(&html);
-
 	html_beginhead(&html);
-
 	html_beginmeta(&html);
 	html_begincharset(&html);
 	html_text(&html, "utf-8");
@@ -347,16 +362,14 @@ main(void)
 	html_endnav(&html);
 	html_endheader(&html);
 
-	if (getprojects()) {
+	if (pp) {
 		html_beginmain(&html);
 		html_beginclass(&html);
 		html_text(&html, "stack");
 		html_endclass(&html);
-
 		html_beginul(&html);
-		while ((p = SIMPLEQ_FIRST(&head))) {
+		for (p = pp; p && (t = p->next, 1); p = t) {
 			html_beginli(&html);
-
 			html_beginanchor(&html);
 			html_beginhref(&html);
 			html_text(&html, p->url);
@@ -369,7 +382,6 @@ main(void)
 			html_text(&html, "noreferrer");
 			html_endrel(&html);
 			html_text(&html, p->name);
-
 			html_endanchor(&html);
 			html_text(&html, " ");
 			html_begincode(&html);
@@ -377,12 +389,9 @@ main(void)
 			html_endcode(&html);
 			html_text(&html, ": %s", p->desc);
 			html_endli(&html);
-
-			SIMPLEQ_REMOVE_HEAD(&head, projects);
-			freeproject(p);
+			destroyp(p);
 		}
 		html_endul(&html);
-
 		html_endmain(&html);
 	} else {
 		html_beginmain(&html);
