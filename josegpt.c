@@ -273,7 +273,7 @@ main(void)
 	html_text(&html, "/static/img/banner.png");
 	html_endcontent(&html);
 	html_beginproperty(&html);
-	html_text(&html, "og:img");
+	html_text(&html, "og:image");
 	html_endproperty(&html);
 	html_endmeta(&html);
 
