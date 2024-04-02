@@ -25,48 +25,131 @@
 
 #define HTML_IMPLEMENTATION
 #include "html.h"
-#include "josegpt.h"
 
-static SIMPLEQ_HEAD(portfolio, project) head = SIMPLEQ_HEAD_INITIALIZER(head);
-
-static const char *licstr[] = {
-	"isc", "mit", "gpl3", "none"
+SIMPLEQ_HEAD(projecthead, project);
+struct project {
+	char	              *name;
+	char	              *desc;
+	char	              *url;
+	char	              *lic;
+	char	              *lang;
+	SIMPLEQ_ENTRY(project) projects;
 };
 
-static const char *langstr[] = {
-	"c", "html", "shell", "unknown",
-	"makefile", "elisp", "js"
+struct conv {
+	const char	*from;
+	const char	*to;
 };
 
-static struct {
-	const char *from;
-	enum lic    to;
-} lictable[] = {
-	{"ISC",     ISC},
-	{"MIT",     MIT},
-	{"GPL-3.0", GPL3}
+int	getprojects(void);
+void	freeproject(struct project *);
+int	binsearch(const char *, struct conv *);
+
+static struct projecthead head = SIMPLEQ_HEAD_INITIALIZER(head);
+
+static struct conv convs[] = {
+	{"C",           "c"},
+	{"Emacs Lisp",  "elisp"},
+	{"GPL-3.0",     "gpl3"},
+	{"HTML",        "html"},
+	{"ISC",         "isc"},
+	{"MIT",         "mit"},
+	{"Makefile",    "makefile"},
+	{"NOASSERTION", "other"},
+	{"Shell",       "shell"},
+	{"Vue",         "js"},
 };
 
-static struct {
-	const char *from;
-	enum lang   to;
-} langtable[] = {
-	{"C",          C},
-	{"HTML",       HTML_},
-	{"Shell",      SHELL},
-	{"Makefile",   MAKEFILE},
-	{"Emacs Lisp", EMACSLISP},
-	{"Vue",        JAVASCRIPT}
-};
+int
+getprojects(void)
+{
+	struct json_object *json, *o, *name, *desc, *url;
+	struct json_object *lic, *lang, *spdx;
+	struct project     *p;
+	const char         *filename;
+	int                 i, m, n, result;
 
-static enum lic  strtolic(const char *);
-static enum lang strtolang(const char *);
+	filename = "/cache/projects.json";
+	json = json_object_from_file(filename);
+	if (json) {
+		n = json_object_array_length(json);
+		for (i = 0; i < n; ++i) {
+			o = json_object_array_get_idx(json, i);
+
+			json_object_object_get_ex(o, "name", &name);
+			json_object_object_get_ex(o, "description", &desc);
+			json_object_object_get_ex(o, "html_url", &url);
+			json_object_object_get_ex(o, "license", &lic);
+			json_object_object_get_ex(o, "language", &lang);
+
+			json_object_object_get_ex(lic, "spdx_id", &spdx);
+
+			p = malloc(sizeof(struct project));
+			if (p) {
+				p->name = strdup(name ? json_object_get_string(name) : "noname");
+				p->desc = strdup(desc ? json_object_get_string(desc) : "nodescription");
+				p->url  = strdup(url ? json_object_get_string(url) : "nourl");
+
+				m = binsearch(spdx ? json_object_get_string(spdx) : "", convs);
+				p->lic = strdup(m == -1 ? "none" : (convs + m)->to);
+
+				m = binsearch(lang ? json_object_get_string(lang) : "", convs);
+				p->lang = strdup(m == -1 ? "unknown" : (convs + m)->to);
+
+				SIMPLEQ_INSERT_TAIL(&head, p, projects);
+			} else {
+				warn(NULL);
+				result = 0;
+				break;
+			}
+		}
+		json_object_put(json);
+		json = NULL;
+		result = !SIMPLEQ_EMPTY(&head);
+	} else {
+		warn("could not read %s", filename);
+		result = 0;
+	}
+	return (result);
+}
+
+
+void
+freeproject(struct project *p)
+{
+	free(p->name);
+	free(p->desc);
+	free(p->url);
+	free(p->lic);
+	free(p->lang);
+	free(p);
+	p = NULL;
+}
+
+int
+binsearch(const char *w, struct conv *cc)
+{
+	int cond, high, mid, low;
+
+	low = 0;
+	high = sizeof(convs) / sizeof(convs[0]) - 1;
+	while (low <= high) {
+		mid = (low + high) / 2;
+		if ((cond = strcmp(w, cc[mid].from)) < 0)
+			high = mid - 1;
+		else if (cond > 0)
+			low = mid + 1;
+		else
+			return mid;
+	}
+	return -1;
+}
 
 int
 main(void)
 {
-	struct html     html;
-	struct project *p;
+	struct html	 html;
+	struct project	*p;
 
 	if (pledge("stdio rpath", NULL) == -1)
 		err(EXIT_FAILURE, "pledge");
@@ -175,7 +258,7 @@ main(void)
 	html_text(&html, "/static/img/banner.png");
 	html_endcontent(&html);
 	html_beginproperty(&html);
-	html_text(&html, "og:image");
+	html_text(&html, "og:img");
 	html_endproperty(&html);
 	html_endmeta(&html);
 
@@ -187,7 +270,7 @@ main(void)
 	html_text(&html, "/static/img/favicon.ico");
 	html_endhref(&html);
 	html_begintype(&html);
-	html_text(&html, "image/x-icon");
+	html_text(&html, "img/x-icon");
 	html_endtype(&html);
 	html_endlink(&html);
 
@@ -234,7 +317,7 @@ main(void)
 	html_text(&html, "/");
 	html_endhref(&html);
 
-	html_beginimage(&html);
+	html_beginimg(&html);
 	html_beginheight(&html);
 	html_text(&html, "%d", 30);
 	html_endheight(&html);
@@ -251,7 +334,7 @@ main(void)
 	html_text(&html, "Logo");
 	html_endalt(&html);
 
-	html_endimage(&html);
+	html_endimg(&html);
 	html_endanchor(&html);
 
 	html_begindiv(&html);
@@ -264,17 +347,17 @@ main(void)
 	html_endnav(&html);
 	html_endheader(&html);
 
-	if (getprojects(&head)) {
+	if (getprojects()) {
 		html_beginmain(&html);
 		html_beginclass(&html);
 		html_text(&html, "stack");
 		html_endclass(&html);
 
+		html_beginul(&html);
 		while ((p = SIMPLEQ_FIRST(&head))) {
-			html_beginarticle(&html);
-			html_beginh2(&html);
-			html_beginanchor(&html);
+			html_beginli(&html);
 
+			html_beginanchor(&html);
 			html_beginhref(&html);
 			html_text(&html, p->url);
 			html_endhref(&html);
@@ -288,22 +371,17 @@ main(void)
 			html_text(&html, p->name);
 
 			html_endanchor(&html);
-			html_endh2(&html);
-
-			html_beginp(&html);
-			html_text(&html, p->desc);
-			html_endp(&html);
-
-			html_beginfooter(&html);
-			html_beginem(&html);
-			html_text(&html, "%s@%s", langtostr(p->lang), lictostr(p->lic));
-			html_endem(&html);
-			html_endfooter(&html);
-			html_endarticle(&html);
+			html_text(&html, " ");
+			html_begincode(&html);
+			html_text(&html, "%s@%s", p->lang, p->lic);
+			html_endcode(&html);
+			html_text(&html, ": %s", p->desc);
+			html_endli(&html);
 
 			SIMPLEQ_REMOVE_HEAD(&head, projects);
 			freeproject(p);
 		}
+		html_endul(&html);
 
 		html_endmain(&html);
 	} else {
@@ -410,108 +488,4 @@ main(void)
 	html_end(&html);
 
 	return (EXIT_SUCCESS);
-}
-
-int
-getprojects(struct portfolio *pp)
-{
-	struct json_object *json, *o, *name, *desc, *url;
-	struct json_object *lic, *lang, *spdx;
-	struct project     *p;
-	const char         *filename;
-	int                 i, n, result;
-
-	filename = "/cache/projects.json";
-	json = json_object_from_file(filename);
-	if (json) {
-		n = json_object_array_length(json);
-		for (i = 0; i < n; ++i) {
-			o = json_object_array_get_idx(json, i);
-
-			json_object_object_get_ex(o, "name", &name);
-			json_object_object_get_ex(o, "description", &desc);
-			json_object_object_get_ex(o, "html_url", &url);
-			json_object_object_get_ex(o, "license", &lic);
-			json_object_object_get_ex(o, "language", &lang);
-
-			json_object_object_get_ex(lic, "spdx_id", &spdx);
-
-			p = (struct project *)malloc(sizeof(struct project));
-			if (p) {
-				p->name = strdup(name ? json_object_get_string(name) : "noname");
-				p->desc = strdup(desc ? json_object_get_string(desc) : "nodescription");
-				p->url  = strdup(url ? json_object_get_string(url) : "nourl");
-				p->lic  = spdx ? strtolic(json_object_get_string(spdx)) : NONE;
-				p->lang = lang ? strtolang(json_object_get_string(lang)) : UNKNOWN;
-
-				SIMPLEQ_INSERT_TAIL(pp, p, projects);
-			} else {
-				warn(NULL);
-				result = 0;
-				break;
-			}
-		}
-		json_object_put(json);
-		json = NULL;
-		result = !SIMPLEQ_EMPTY(pp);
-	} else {
-		warn("could not read %s", filename);
-		result = 0;
-	}
-	return (result);
-}
-
-
-void
-freeproject(struct project *p)
-{
-	free(p->name);
-	free(p->desc);
-	free(p->url);
-	free(p);
-	p = NULL;
-}
-
-const char *
-lictostr(enum lic l)
-{
-	return (licstr[l]);
-}
-
-const char *
-langtostr(enum lang l)
-{
-	return (langstr[l]);
-}
-
-static enum lic
-strtolic(const char *str)
-{
-	enum lic result;
-	int i;
-
-	result = NONE;
-	for (i = 0; i < (int)nitems(lictable); ++i) {
-		if (strcmp(lictable[i].from, str) == 0) {
-			result = lictable[i].to;
-			break;
-		}
-	}
-	return (result);
-}
-
-static enum lang
-strtolang(const char *str)
-{
-	enum lang result;
-	int i;
-
-	result = UNKNOWN;
-	for (i = 0; i < (int)nitems(langtable); ++i) {
-		if (strcmp(langtable[i].from, str) == 0) {
-			result = langtable[i].to;
-			break;
-		}
-	}
-	return (result);
 }
