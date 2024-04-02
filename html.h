@@ -21,8 +21,9 @@ enum html_tag {
 	HTML, HEAD, META, TITLE, LINK, BODY,
 	HEADER, FOOTER, NAV, SECTION, MAIN, ARTICLE, DIV,
 	H1, H2, H3, H4, H5, H6,
-	P, HR, PRE, BLOCKQUOTE, ANCHOR,
-	SMALL, EM, IMAGE, SPAN,
+	P, HR, PRE, BLOCKQUOTE, ANCHOR, CODE,
+	UL, OL, LI,
+	SMALL, EM, IMG, SPAN,
 	TAGMAX
 };
 
@@ -69,10 +70,14 @@ void html_beginheader(struct html *);
 void html_begindiv(struct html *);
 void html_beginmain(struct html *);
 void html_beginarticle(struct html *);
+void html_beginul(struct html *);
+void html_beginol(struct html *);
+void html_beginli(struct html *);
 void html_beginp(struct html *);
 void html_beginnav(struct html *);
 void html_beginanchor(struct html *);
-void html_beginimage(struct html *);
+void html_begincode(struct html *);
+void html_beginimg(struct html *);
 void html_beginheight(struct html *);
 void html_beginwidth(struct html *);
 void html_beginsrc(struct html *);
@@ -113,10 +118,14 @@ void html_endheader(struct html *);
 void html_enddiv(struct html *);
 void html_endmain(struct html *);
 void html_endarticle(struct html *);
+void html_endul(struct html *);
+void html_endol(struct html *);
+void html_endli(struct html *);
 void html_endp(struct html *);
 void html_endnav(struct html *);
 void html_endanchor(struct html *);
-void html_endimage(struct html *);
+void html_endcode(struct html *);
+void html_endimg(struct html *);
 void html_endheight(struct html *);
 void html_endwidth(struct html *);
 void html_endsrc(struct html *);
@@ -148,7 +157,8 @@ static const char *html_tags[TAGMAX] = {
 	"html", "head", "meta", "title", "link", "body",
 	"header", "footer", "nav", "section", "main", "article", "div",
 	"h1", "h2", "h3", "h4", "h5", "h6",
-	"p", "hr", "pre", "blockquote", "a",
+	"p", "hr", "pre", "blockquote", "a", "code",
+	"ul", "ol", "li",
 	"small", "em", "img", "span"
 };
 
@@ -334,6 +344,23 @@ html_beginarticle(struct html *html)
 	html_begintag(html, html_tags[ARTICLE]);
 }
 
+void
+html_beginul(struct html *html)
+{
+	html_begintag(html, html_tags[UL]);
+}
+
+void
+html_beginol(struct html *html)
+{
+	html_begintag(html, html_tags[OL]);
+}
+
+void
+html_beginli(struct html *html)
+{
+	html_begintag(html, html_tags[LI]);
+}
 
 void
 html_beginp(struct html *html)
@@ -354,9 +381,15 @@ html_beginanchor(struct html *html)
 }
 
 void
-html_beginimage(struct html *html)
+html_begincode(struct html *html)
 {
-	html_beginselftag(html, html_tags[IMAGE]);
+	html_begintag(html, html_tags[CODE]);
+}
+
+void
+html_beginimg(struct html *html)
+{
+	html_beginselftag(html, html_tags[IMG]);
 }
 
 void
@@ -513,6 +546,25 @@ html_endarticle(struct html *html)
 }
 
 void
+html_endul(struct html *html)
+{
+	html_endtag(html, html_tags[UL]);
+}
+
+void
+html_endol(struct html *html)
+{
+	html_endtag(html, html_tags[OL]);
+}
+
+void
+html_endli(struct html *html)
+{
+	html_endtag(html, html_tags[LI]);
+}
+
+
+void
 html_endp(struct html *html)
 {
 	html_endtag(html, html_tags[P]);
@@ -621,7 +673,13 @@ html_endanchor(struct html *html)
 }
 
 void
-html_endimage(struct html *html)
+html_endcode(struct html *html)
+{
+	html_endtag(html, html_tags[CODE]);
+}
+
+void
+html_endimg(struct html *html)
 {
 	html_endselftag(html);
 }
