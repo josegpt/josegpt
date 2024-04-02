@@ -364,9 +364,6 @@ main(void)
 
 	if (pp) {
 		html_beginmain(&html);
-		html_beginclass(&html);
-		html_text(&html, "stack");
-		html_endclass(&html);
 		html_beginul(&html);
 		for (p = pp; p && (t = p->next, 1); p = t) {
 			html_beginli(&html);
