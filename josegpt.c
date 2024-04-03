@@ -54,7 +54,7 @@ static struct {
 	{"Makefile",	"makefile"},
 	{"NOASSERTION",	"other"},
 	{"Shell",	"shell"},
-	{"Vue",		"js"},
+	{"Vue",		"js"}
 };
 
 struct project *
