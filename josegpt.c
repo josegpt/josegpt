@@ -42,8 +42,8 @@ void		*ecalloc(size_t, size_t);
 char		*estrdup(const char *);
 
 static struct {
-	const char	*from;
-	const char	*to;
+	char	*from;
+	char	*to;
 } mm[] = {
 	{"C",		"c"},
 	{"Emacs Lisp",	"elisp"},
@@ -143,7 +143,7 @@ map(const char *w)
 		else if (cond > 0)
 			low = mid + 1;
 		else
-			return (char *)((mm + mid)->to);
+			return (mm[mid].to);
 	}
 	return (NULL);
 }
