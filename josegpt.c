@@ -69,12 +69,11 @@ getpp(void)
 struct project *
 json2pp(void)
 {
-	struct project     *ph, **pt;
-	struct json_object *json, *o, *name, *desc, *url;
-	struct json_object *lic, *lang, *spdx;
-	struct project     *p;
-	const char         *filename;
-	int                 i, n;
+	struct project *p, *ph, **pt;
+	struct json_object *json, *desc, *lang, *lic;
+	struct json_object *name, *o, *url, *spdx;
+	char *filename;
+	int i, n;
 
 	ph = NULL;
 	pt = &ph;
@@ -108,13 +107,13 @@ struct project *
 createp(char *name, char *desc, char *url, char *lic, char *lang)
 {
 	struct project *p;
-	char           *s;
+	char *s;
 
 	p = ecalloc(1, sizeof(struct project));
 	p->name = estrdup(name);
 	p->desc = estrdup(desc);
 	p->url  = estrdup(url);
-	p->lic  = estrdup((s = map(lic)) ? s : "none");
+	p->lic  = estrdup((s = map(lic))  ? s : "none");
 	p->lang = estrdup((s = map(lang)) ? s : "unknown");
 	return (p);
 }
@@ -172,8 +171,8 @@ estrdup(const char *s)
 int
 main(void)
 {
-	struct html	 html;
-	struct project	*p, *t;
+	struct html html;
+	struct project *p, *t;
 
 	if (pledge("stdio rpath", NULL) == -1)
 		err(EXIT_FAILURE, "pledge");
