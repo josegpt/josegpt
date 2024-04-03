@@ -183,6 +183,10 @@ main(void)
 	puts("\r");
 
 	html_begin(&html);
+	html_beginlang(&html);
+	html_text(&html, "en-US");
+	html_endlang(&html);
+
 	html_beginhead(&html);
 	html_beginmeta(&html);
 	html_begincharset(&html);

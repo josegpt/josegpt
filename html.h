@@ -29,7 +29,7 @@ enum html_tag {
 
 enum html_attr {
 	CHARSET, NAME, CONTENT, PROPERTY, REL,
-	HREF, TYPE, AS, CLASS, DATA,
+	LANG, HREF, TYPE, AS, CLASS, DATA,
 	HEIGHT, WIDTH, SRC, ALT, TARGET,
 	ATTRMAX
 };
@@ -63,6 +63,7 @@ void html_beginname(struct html *);
 void html_beginproperty(struct html *);
 void html_beginlink(struct html *);
 void html_beginrel(struct html *);
+void html_beginlang(struct html *);
 void html_beginhref(struct html *);
 void html_begintype(struct html *);
 void html_beginas(struct html *);
@@ -111,6 +112,7 @@ void html_endname(struct html *);
 void html_endproperty(struct html *);
 void html_endlink(struct html *);
 void html_endrel(struct html *);
+void html_endlang(struct html *);
 void html_endhref(struct html *);
 void html_endtype(struct html *);
 void html_endas(struct html *);
@@ -164,7 +166,7 @@ static const char *html_tags[TAGMAX] = {
 
 static const char *html_attrs[ATTRMAX] = {
 	"charset", "name", "content", "property", "rel",
-	"href", "type", "as", "class", "data",
+	"lang", "href", "type", "as", "class", "data",
 	"height", "width", "src", "alt", "target"
 };
 
@@ -300,6 +302,12 @@ void
 html_beginrel(struct html *html)
 {
 	html_beginattr(html, html_attrs[REL]);
+}
+
+void
+html_beginlang(struct html *html)
+{
+	html_beginattr(html, html_attrs[LANG]);
 }
 
 void
@@ -632,6 +640,12 @@ html_endlink(struct html *html)
 
 void
 html_endrel(struct html *html)
+{
+	html_endattr(html);
+}
+
+void
+html_endlang(struct html *html)
 {
 	html_endattr(html);
 }
