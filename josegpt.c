@@ -33,21 +33,18 @@ struct project {
 	struct project	*next;
 };
 
-struct conv {
-	const char	*from;
-	const char	*to;
-};
-
-void		 getpp(void);
+struct project	*getpp(void);
+struct project	*json2pp(void);
 struct project	*createp(char *, char *, char *, char *, char *);
 void		 destroyp(struct project *);
-const char	*map(const char *);
+char		*map(const char *);
 void		*ecalloc(size_t, size_t);
 char		*estrdup(const char *);
 
-static struct project *pp, **ppt = &pp;
-
-static struct conv convs[] = {
+static struct {
+	const char	*from;
+	const char	*to;
+} mm[] = {
 	{"C",		"c"},
 	{"Emacs Lisp",	"elisp"},
 	{"GPL-3.0",	"gpl3"},
@@ -60,15 +57,27 @@ static struct conv convs[] = {
 	{"Vue",		"js"},
 };
 
-void
+struct project *
 getpp(void)
 {
+	struct project *pp;
+
+	pp = json2pp();
+	return (pp);
+}
+
+struct project *
+json2pp(void)
+{
+	struct project     *ph, **pt;
 	struct json_object *json, *o, *name, *desc, *url;
 	struct json_object *lic, *lang, *spdx;
 	struct project     *p;
 	const char         *filename;
 	int                 i, n;
 
+	ph = NULL;
+	pt = &ph;
 	filename = "/cache/projects.json";
 	json = json_object_from_file(filename);
 	if (json) {
@@ -86,26 +95,27 @@ getpp(void)
 			    (char *)json_object_get_string(url),
 			    (char *)(spdx ? json_object_get_string(spdx) : ""),
 			    (char *)json_object_get_string(lang));
-			*ppt = p;
-			ppt = &p->next;
+			*pt = p;
+			pt = &p->next;
 		}
 		json_object_put(json);
 	} else
 		warn("could not read %s", filename);
+	return (ph);
 }
 
 struct project *
 createp(char *name, char *desc, char *url, char *lic, char *lang)
 {
 	struct project *p;
-	char *s;
+	char           *s;
 
 	p = ecalloc(1, sizeof(struct project));
 	p->name = estrdup(name);
 	p->desc = estrdup(desc);
 	p->url  = estrdup(url);
-	p->lic  = estrdup((s = (char *)map(lic)) ? s : "none");
-	p->lang = estrdup((s = (char *)map(lang)) ? s : "unknown");
+	p->lic  = estrdup((s = map(lic)) ? s : "none");
+	p->lang = estrdup((s = map(lang)) ? s : "unknown");
 	return (p);
 }
 
@@ -120,21 +130,21 @@ destroyp(struct project *p)
 	free(p);
 }
 
-const char *
+char *
 map(const char *w)
 {
 	int cond, high, mid, low;
 
 	low = 0;
-	high = sizeof(convs) / sizeof(convs[0]) - 1;
+	high = sizeof(mm) / sizeof(mm[0]) - 1;
 	while (low <= high) {
 		mid = (low + high) / 2;
-		if ((cond = strcmp(w, convs[mid].from)) < 0)
+		if ((cond = strcmp(w, mm[mid].from)) < 0)
 			high = mid - 1;
 		else if (cond > 0)
 			low = mid + 1;
 		else
-			return ((convs + mid)->to);
+			return (char *)((mm + mid)->to);
 	}
 	return (NULL);
 }
@@ -167,8 +177,6 @@ main(void)
 
 	if (pledge("stdio rpath", NULL) == -1)
 		err(EXIT_FAILURE, "pledge");
-
-	getpp();
 
 	puts("Status: 200 OK\r");
 	puts("Content-Type: text/html\r");
@@ -276,6 +284,24 @@ main(void)
 	html_endproperty(&html);
 	html_endmeta(&html);
 
+	html_beginmeta(&html);
+	html_begincontent(&html);
+	html_text(&html, "/static/img/banner.png");
+	html_endcontent(&html);
+	html_beginproperty(&html);
+	html_text(&html, "og:image:secure_url");
+	html_endproperty(&html);
+	html_endmeta(&html);
+
+	html_beginmeta(&html);
+	html_begincontent(&html);
+	html_text(&html, "josegpt.com logo.");
+	html_endcontent(&html);
+	html_beginproperty(&html);
+	html_text(&html, "og:image:alt");
+	html_endproperty(&html);
+	html_endmeta(&html);
+
 	html_beginlink(&html);
 	html_beginrel(&html);
 	html_text(&html, "icon");
@@ -361,10 +387,10 @@ main(void)
 	html_endnav(&html);
 	html_endheader(&html);
 
-	if (pp) {
+	if ((p = getpp())) {
 		html_beginmain(&html);
 		html_beginul(&html);
-		for (p = pp; p && (t = p->next, 1); p = t) {
+		for (; p && (t = p->next, 1); p = t) {
 			html_beginli(&html);
 			html_beginanchor(&html);
 			html_beginhref(&html);
