@@ -48,16 +48,16 @@ char		*estrdup(const char *);
 static struct project *pp, **ppt = &pp;
 
 static struct conv convs[] = {
-	{"C",           "c"},
-	{"Emacs Lisp",  "elisp"},
-	{"GPL-3.0",     "gpl3"},
-	{"HTML",        "html"},
-	{"ISC",         "isc"},
-	{"MIT",         "mit"},
-	{"Makefile",    "makefile"},
-	{"NOASSERTION", "other"},
-	{"Shell",       "shell"},
-	{"Vue",         "js"},
+	{"C",		"c"},
+	{"Emacs Lisp",	"elisp"},
+	{"GPL-3.0",	"gpl3"},
+	{"HTML",	"html"},
+	{"ISC",		"isc"},
+	{"MIT",		"mit"},
+	{"Makefile",	"makefile"},
+	{"NOASSERTION",	"other"},
+	{"Shell",	"shell"},
+	{"Vue",		"js"},
 };
 
 void
