@@ -235,7 +235,7 @@ main(void)
 
 	html_beginmeta(&html);
 	html_begincontent(&html);
-	html_text(&html, "red");
+	html_text(&html, "#d90000");
 	html_endcontent(&html);
 	html_beginname(&html);
 	html_text(&html, "theme-color");
@@ -287,34 +287,25 @@ main(void)
 	html_endproperty(&html);
 	html_endmeta(&html);
 
-	html_beginmeta(&html);
-	html_begincontent(&html);
-	html_text(&html, "/static/img/banner.png");
-	html_endcontent(&html);
-	html_beginproperty(&html);
-	html_text(&html, "og:image:secure_url");
-	html_endproperty(&html);
-	html_endmeta(&html);
-
-	html_beginmeta(&html);
-	html_begincontent(&html);
-	html_text(&html, "josegpt.com logo.");
-	html_endcontent(&html);
-	html_beginproperty(&html);
-	html_text(&html, "og:image:alt");
-	html_endproperty(&html);
-	html_endmeta(&html);
-
 	html_beginlink(&html);
 	html_beginrel(&html);
 	html_text(&html, "icon");
 	html_endrel(&html);
 	html_beginhref(&html);
-	html_text(&html, "/static/img/favicon.ico");
+	html_text(&html, "/static/img/favicon.svg");
 	html_endhref(&html);
-	html_begintype(&html);
-	html_text(&html, "img/x-icon");
-	html_endtype(&html);
+	html_endlink(&html);
+
+	html_beginlink(&html);
+	html_beginrel(&html);
+	html_text(&html, "mask-icon");
+	html_endrel(&html);
+	html_beginhref(&html);
+	html_text(&html, "/static/img/favicon.svg");
+	html_endhref(&html);
+	html_begincolor(&html);
+	html_text(&html, "#d90000");
+	html_endcolor(&html);
 	html_endlink(&html);
 
 	html_beginlink(&html);
@@ -352,34 +343,14 @@ main(void)
 	html_enddata(&html);
 
 	html_beginanchor(&html);
-	html_beginclass(&html);
-	html_text(&html, "cluster");
-	html_endclass(&html);
-
+	html_begindata(&html, "style");
+	html_text(&html, "logo");
+	html_enddata(&html);
 	html_beginhref(&html);
 	html_text(&html, "/");
 	html_endhref(&html);
-
-	html_beginimg(&html);
-	html_beginheight(&html);
-	html_text(&html, "%d", 30);
-	html_endheight(&html);
-
-	html_beginwidth(&html);
-	html_text(&html, "%d", 50);
-	html_endwidth(&html);
-
-	html_beginsrc(&html);
-	html_text(&html, "/static/img/logo.svg");
-	html_endsrc(&html);
-
-	html_beginalt(&html);
-	html_text(&html, "Logo");
-	html_endalt(&html);
-
-	html_endimg(&html);
+	html_text(&html, "0xFF0000");
 	html_endanchor(&html);
-
 	html_begindiv(&html);
 
 	html_beginspan(&html);
@@ -464,6 +435,20 @@ main(void)
 	html_text(&html, "mailto:josegpt27@gmail.com");
 	html_endhref(&html);
 	html_text(&html, "Email");
+	html_endanchor(&html);
+
+	html_beginanchor(&html);
+	html_beginhref(&html);
+	html_text(&html, "https://design.redhex.dev");
+	html_endhref(&html);
+	html_begintarget(&html);
+	html_text(&html, "_blank");
+	html_endtarget(&html);
+	html_beginrel(&html);
+	html_text(&html, "noopener");
+	html_text(&html, "noreferrer");
+	html_endrel(&html);
+	html_text(&html, "Design");
 	html_endanchor(&html);
 
 	html_beginanchor(&html);

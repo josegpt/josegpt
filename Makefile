@@ -2,7 +2,6 @@ VERSION?=	dev
 
 PREFIX=		${DESTDIR}/var/www
 CGIDIR=		${PREFIX}/cgi-bin
-HTDOCSDIR=	${PREFIX}/htdocs/josegpt
 
 JSONINCS=	/usr/local/include/json-c
 JSONLIB=	/usr/local/lib
@@ -27,9 +26,8 @@ clean:
 install: all
 	mkdir -p ${CGIDIR} ${HTDOCSDIR}
 	cp -p josegpt ${CGIDIR}
-	cp -Rp static ${HTDOCSDIR}
 
 uninstall:
 	rm -rf ${CGIDIR}/josegpt ${HTDOCSDIR}
 
-.PHONY: all clean static install uninstall
+.PHONY: all clean install uninstall

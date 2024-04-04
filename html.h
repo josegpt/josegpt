@@ -30,7 +30,7 @@ enum html_tag {
 enum html_attr {
 	CHARSET, NAME, CONTENT, PROPERTY, REL,
 	LANG, HREF, TYPE, AS, CLASS, DATA,
-	HEIGHT, WIDTH, SRC, ALT, TARGET,
+	HEIGHT, WIDTH, SRC, ALT, TARGET, COLOR,
 	ATTRMAX
 };
 
@@ -167,7 +167,7 @@ static const char *html_tags[TAGMAX] = {
 static const char *html_attrs[ATTRMAX] = {
 	"charset", "name", "content", "property", "rel",
 	"lang", "href", "type", "as", "class", "data",
-	"height", "width", "src", "alt", "target"
+	"height", "width", "src", "alt", "target", "color"
 };
 
 static void
@@ -434,6 +434,12 @@ void
 html_begintarget(struct html *html)
 {
 	html_beginattr(html, html_attrs[TARGET]);
+}
+
+void
+html_begincolor(struct html *html)
+{
+	html_beginattr(html, html_attrs[COLOR]);
 }
 
 void
@@ -730,6 +736,12 @@ html_endsection(struct html *html)
 
 void
 html_endtarget(struct html *html)
+{
+	html_endattr(html);
+}
+
+void
+html_endcolor(struct html *html)
 {
 	html_endattr(html);
 }
