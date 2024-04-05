@@ -90,10 +90,10 @@ json2pp(void)
 			json_object_object_get_ex(o, "language", &lang);
 			json_object_object_get_ex(lic, "spdx_id", &spdx);
 			p = createp((char *)json_object_get_string(name),
-			    (char *)json_object_get_string(desc),
+			    (char *)(desc ? json_object_get_string(desc) : "nodesc"),
 			    (char *)json_object_get_string(url),
 			    (char *)(spdx ? json_object_get_string(spdx) : ""),
-			    (char *)json_object_get_string(lang));
+			    (char *)(lang ? json_object_get_string(lang) : ""));
 			*pt = p;
 			pt = &p->next;
 		}
