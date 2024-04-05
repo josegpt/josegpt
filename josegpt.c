@@ -441,13 +441,6 @@ main(void)
 	html_beginhref(&html);
 	html_text(&html, "https://design.redhex.dev");
 	html_endhref(&html);
-	html_begintarget(&html);
-	html_text(&html, "_blank");
-	html_endtarget(&html);
-	html_beginrel(&html);
-	html_text(&html, "noopener");
-	html_text(&html, "noreferrer");
-	html_endrel(&html);
 	html_text(&html, "Design");
 	html_endanchor(&html);
 
