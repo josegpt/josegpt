@@ -24,10 +24,10 @@ clean:
 	rm -rf *.o *.core ktrace.out josegpt
 
 install: all
-	mkdir -p ${CGIDIR} ${HTDOCSDIR}
+	mkdir -p ${CGIDIR}
 	cp -p josegpt ${CGIDIR}
 
 uninstall:
-	rm -rf ${CGIDIR}/josegpt ${HTDOCSDIR}
+	rm -rf ${CGIDIR}/josegpt
 
 .PHONY: all clean install uninstall
