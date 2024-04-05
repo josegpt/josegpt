@@ -171,7 +171,7 @@ estrdup(const char *s)
 int
 main(void)
 {
-	struct html html;
+	static struct html html;
 	struct project *p, *t;
 
 	if (pledge("stdio rpath", NULL) == -1)
