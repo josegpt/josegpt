@@ -37,9 +37,7 @@ struct project	*getpp(void);
 struct project	*createp(const char *, const char *, const char *,
     const char *, const char *);
 struct project	*json2pp(void);
-struct project	*createp(const char *, const char *,
-    const char *, const char *, const char *);
-void		 destroyp(struct project *);
+void		 freep(struct project *);
 const char	*map(const char *);
 void		*ecalloc(size_t, size_t);
 char		*estrdup(const char *);
@@ -123,7 +121,7 @@ createp(const char *name, const char *desc, const char *url,
 }
 
 void
-destroyp(struct project *p)
+freep(struct project *p)
 {
 	free(p->name);
 	free(p->desc);
@@ -389,7 +387,7 @@ main(void)
 			html_endcode(&html);
 			html_text(&html, ": %s", p->desc);
 			html_endli(&html);
-			destroyp(p);
+			freep(p);
 		}
 		html_endul(&html);
 		html_endmain(&html);
