@@ -21,7 +21,7 @@ enum html_tag {
 	HTML, HEAD, META, TITLE, LINK, BODY,
 	HEADER, FOOTER, NAV, SECTION, MAIN, ARTICLE, DIV,
 	H1, H2, H3, H4, H5, H6,
-	P, HR, PRE, BLOCKQUOTE, ANCHOR, CODE,
+	P, HR, PRE, BLOCKQUOTE, A, CODE,
 	UL, OL, LI,
 	SMALL, EM, IMG, SPAN,
 	TAGMAX
@@ -76,7 +76,7 @@ void html_beginol(struct html *);
 void html_beginli(struct html *);
 void html_beginp(struct html *);
 void html_beginnav(struct html *);
-void html_beginanchor(struct html *);
+void html_begina(struct html *);
 void html_begincode(struct html *);
 void html_beginimg(struct html *);
 void html_beginheight(struct html *);
@@ -125,7 +125,7 @@ void html_endol(struct html *);
 void html_endli(struct html *);
 void html_endp(struct html *);
 void html_endnav(struct html *);
-void html_endanchor(struct html *);
+void html_enda(struct html *);
 void html_endcode(struct html *);
 void html_endimg(struct html *);
 void html_endheight(struct html *);
@@ -383,9 +383,9 @@ html_beginnav(struct html *html)
 }
 
 void
-html_beginanchor(struct html *html)
+html_begina(struct html *html)
 {
-	html_begintag(html, html_tags[ANCHOR]);
+	html_begintag(html, html_tags[A]);
 }
 
 void
@@ -687,9 +687,9 @@ html_endnav(struct html *html)
 }
 
 void
-html_endanchor(struct html *html)
+html_enda(struct html *html)
 {
-	html_endtag(html, html_tags[ANCHOR]);
+	html_endtag(html, html_tags[A]);
 }
 
 void

@@ -344,7 +344,7 @@ main(void)
 	html_text(&html, "center");
 	html_enddata(&html);
 
-	html_beginanchor(&html);
+	html_begina(&html);
 	html_begindata(&html, "style");
 	html_text(&html, "logo");
 	html_enddata(&html);
@@ -352,7 +352,7 @@ main(void)
 	html_text(&html, "/");
 	html_endhref(&html);
 	html_text(&html, "0xFF0000");
-	html_endanchor(&html);
+	html_enda(&html);
 	html_begindiv(&html);
 
 	html_beginspan(&html);
@@ -368,7 +368,7 @@ main(void)
 		html_beginul(&html);
 		for (; p && (t = p->next, 1); p = t) {
 			html_beginli(&html);
-			html_beginanchor(&html);
+			html_begina(&html);
 			html_beginhref(&html);
 			html_text(&html, p->url);
 			html_endhref(&html);
@@ -380,7 +380,7 @@ main(void)
 			html_text(&html, "noreferrer");
 			html_endrel(&html);
 			html_text(&html, p->name);
-			html_endanchor(&html);
+			html_enda(&html);
 			html_text(&html, " ");
 			html_begincode(&html);
 			html_text(&html, "%s@%s", p->lang, p->lic);
@@ -432,21 +432,21 @@ main(void)
 	html_text(&html, "center");
 	html_enddata(&html);
 
-	html_beginanchor(&html);
+	html_begina(&html);
 	html_beginhref(&html);
 	html_text(&html, "mailto:josegpt27@gmail.com");
 	html_endhref(&html);
 	html_text(&html, "Email");
-	html_endanchor(&html);
+	html_enda(&html);
 
-	html_beginanchor(&html);
+	html_begina(&html);
 	html_beginhref(&html);
 	html_text(&html, "https://design.redhex.dev");
 	html_endhref(&html);
 	html_text(&html, "Design");
-	html_endanchor(&html);
+	html_enda(&html);
 
-	html_beginanchor(&html);
+	html_begina(&html);
 	html_beginhref(&html);
 	html_text(&html, "https://sr.ht/~josegpt/");
 	html_endhref(&html);
@@ -458,9 +458,9 @@ main(void)
 	html_text(&html, "noreferrer");
 	html_endrel(&html);
 	html_text(&html, "Sourcehut");
-	html_endanchor(&html);
+	html_enda(&html);
 
-	html_beginanchor(&html);
+	html_begina(&html);
 	html_beginhref(&html);
 	html_text(&html, "https://github.com/josegpt");
 	html_endhref(&html);
@@ -472,7 +472,7 @@ main(void)
 	html_text(&html, "noreferrer");
 	html_endrel(&html);
 	html_text(&html, "GitHub");
-	html_endanchor(&html);
+	html_enda(&html);
 
 	html_endnav(&html);
 
