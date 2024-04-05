@@ -194,7 +194,7 @@ main(void)
 	html_endmeta(&html);
 
 	html_begintitle(&html);
-	html_text(&html, "josegpt &sol; %s", "projects");
+	html_text(&html, "josegpt &sol; %s", "Projects");
 	html_endtitle(&html);
 
 	html_beginmeta(&html);
@@ -253,7 +253,7 @@ main(void)
 
 	html_beginmeta(&html);
 	html_begincontent(&html);
-	html_text(&html, "josegpt &sol; %s", "projects");
+	html_text(&html, "josegpt &sol; %s", "Projects");
 	html_endcontent(&html);
 	html_beginproperty(&html);
 	html_text(&html, "og:title");
@@ -354,7 +354,7 @@ main(void)
 	html_begindiv(&html);
 
 	html_beginspan(&html);
-	html_text(&html, "projects");
+	html_text(&html, "Projects");
 	html_endspan(&html);
 
 	html_enddiv(&html);
