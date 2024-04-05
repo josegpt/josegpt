@@ -34,16 +34,19 @@ struct project {
 };
 
 struct project	*getpp(void);
+struct project	*createp(const char *, const char *, const char *,
+    const char *, const char *);
 struct project	*json2pp(void);
-struct project	*createp(char *, char *, char *, char *, char *);
+struct project	*createp(const char *, const char *,
+    const char *, const char *, const char *);
 void		 destroyp(struct project *);
-char		*map(const char *);
+const char	*map(const char *);
 void		*ecalloc(size_t, size_t);
 char		*estrdup(const char *);
 
 static struct {
-	char	*from;
-	char	*to;
+	const char	*from;
+	const char	*to;
 } mm[] = {
 	{"C",		"c"},
 	{"Emacs Lisp",	"elisp"},
@@ -72,7 +75,7 @@ json2pp(void)
 	struct project *p, *ph, **pt;
 	struct json_object *json, *desc, *lang, *lic;
 	struct json_object *name, *o, *url, *spdx;
-	char *filename;
+	const char *filename;
 	int i, n;
 
 	ph = NULL;
@@ -89,11 +92,11 @@ json2pp(void)
 			json_object_object_get_ex(o, "license", &lic);
 			json_object_object_get_ex(o, "language", &lang);
 			json_object_object_get_ex(lic, "spdx_id", &spdx);
-			p = createp((char *)json_object_get_string(name),
-			    (char *)(desc ? json_object_get_string(desc) : "nodesc"),
-			    (char *)json_object_get_string(url),
-			    (char *)(spdx ? json_object_get_string(spdx) : ""),
-			    (char *)(lang ? json_object_get_string(lang) : ""));
+			p = createp(json_object_get_string(name),
+			    (desc ? json_object_get_string(desc) : "nodesc"),
+			    json_object_get_string(url),
+			    (spdx ? json_object_get_string(spdx) : ""),
+			    (lang ? json_object_get_string(lang) : ""));
 			*pt = p;
 			pt = &p->next;
 		}
@@ -104,10 +107,11 @@ json2pp(void)
 }
 
 struct project *
-createp(char *name, char *desc, char *url, char *lic, char *lang)
+createp(const char *name, const char *desc, const char *url,
+    const char *lic, const char *lang)
 {
 	struct project *p;
-	char *s;
+	const char *s;
 
 	p = ecalloc(1, sizeof(struct project));
 	p->name = estrdup(name);
@@ -129,7 +133,7 @@ destroyp(struct project *p)
 	free(p);
 }
 
-char *
+const char *
 map(const char *w)
 {
 	int cond, high, mid, low;
