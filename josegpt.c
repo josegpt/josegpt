@@ -503,11 +503,7 @@ main(void)
 	html_endclass(&html);
 
 	html_beginsmall(&html);
-	html_text(&html, "josegpt:");
-	html_beginem(&html);
-	html_text(&html, VERSION);
-	html_endem(&html);
-	html_text(&html, " &copy; 2017");
+	html_text(&html, "josegpt:%s &copy; 2017", VERSION);
 	html_endsmall(&html);
 
 	html_endfooter(&html);
