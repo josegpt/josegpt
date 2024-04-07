@@ -47,6 +47,7 @@ static struct {
 	const char	*to;
 } mm[] = {
 	{"C",		"c"},
+	{"CSS",		"css"},
 	{"Emacs Lisp",	"elisp"},
 	{"GPL-3.0",	"gpl3"},
 	{"HTML",	"html"},
@@ -294,7 +295,7 @@ main(void)
 	html_text(&html, "icon");
 	html_endrel(&html);
 	html_beginhref(&html);
-	html_text(&html, "/static/img/favicon.svg");
+	html_text(&html, "/static/img/logo.svg");
 	html_endhref(&html);
 	html_endlink(&html);
 
@@ -303,7 +304,7 @@ main(void)
 	html_text(&html, "mask-icon");
 	html_endrel(&html);
 	html_beginhref(&html);
-	html_text(&html, "/static/img/favicon.svg");
+	html_text(&html, "/static/img/logo.svg");
 	html_endhref(&html);
 	html_begincolor(&html);
 	html_text(&html, "#d90000");
@@ -351,7 +352,20 @@ main(void)
 	html_beginhref(&html);
 	html_text(&html, "/");
 	html_endhref(&html);
-	html_text(&html, "0xFF0000");
+	html_beginimg(&html);
+	html_beginheight(&html);
+	html_text(&html, "30");
+	html_endheight(&html);
+	html_beginwidth(&html);
+	html_text(&html, "30");
+	html_endwidth(&html);
+	html_beginsrc(&html);
+	html_text(&html, "/static/img/logo.svg");
+	html_endsrc(&html);
+	html_beginalt(&html);
+	html_text(&html, "Logo");
+	html_endalt(&html);
+	html_endimg(&html);
 	html_enda(&html);
 	html_begindiv(&html);
 
@@ -365,9 +379,11 @@ main(void)
 
 	if ((p = getpp())) {
 		html_beginmain(&html);
-		html_beginul(&html);
+		html_beginclass(&html);
+		html_text(&html, "stack");
+		html_endclass(&html);
 		for (; p && (t = p->next, 1); p = t) {
-			html_beginli(&html);
+			html_beginarticle(&html);
 			html_begina(&html);
 			html_beginhref(&html);
 			html_text(&html, p->url);
@@ -383,13 +399,18 @@ main(void)
 			html_enda(&html);
 			html_text(&html, " ");
 			html_begincode(&html);
-			html_text(&html, "%s@%s", p->lang, p->lic);
+			html_text(&html, p->lang);
 			html_endcode(&html);
-			html_text(&html, ": %s", p->desc);
-			html_endli(&html);
+			html_text(&html, " ");
+			html_begincode(&html);
+			html_text(&html, p->lic);
+			html_endcode(&html);
+			html_beginp(&html);
+			html_text(&html, p->desc);
+			html_endp(&html);
+			html_endarticle(&html);
 			freep(p);
 		}
-		html_endul(&html);
 		html_endmain(&html);
 	} else {
 		html_beginmain(&html);
@@ -482,11 +503,11 @@ main(void)
 	html_endclass(&html);
 
 	html_beginsmall(&html);
-	html_text(&html, "&copy2017 ");
-	html_text(&html, "josegpt&commat;");
+	html_text(&html, "josegpt:");
 	html_beginem(&html);
 	html_text(&html, VERSION);
 	html_endem(&html);
+	html_text(&html, " &copy; 2017");
 	html_endsmall(&html);
 
 	html_endfooter(&html);
