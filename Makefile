@@ -3,11 +3,14 @@ VERSION?=	dev
 PREFIX=		${DESTDIR}/var/www
 CGIDIR=		${PREFIX}/cgi-bin
 
-JSONINCS=	/usr/local/include/json-c
+HTMLINC=	/usr/local/include
+HTMLLIB=	/usr/local/lib
+
+JSONINC=	/usr/local/include/json-c
 JSONLIB=	/usr/local/lib
 
-INCS=		-I${JSONINCS}
-LIBS=		-L${JSONLIB} -ljson-c
+INCS=		-I${JSONINC} -I${HTMLINC}
+LIBS=		-L${JSONLIB} -ljson-c -L${HTMLLIB} -lhtml
 
 CFLAGS=		-O2 -g -W -Wall -Werror -Wextra -pedantic ${INCS}
 LDFLAGS=	-static -pie ${LIBS}

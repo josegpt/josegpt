@@ -15,14 +15,12 @@
  */
 
 #include <err.h>
+#include <html.h>
 #include <json.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-#define HTML_IMPLEMENTATION
-#include "html.h"
 
 struct project {
 	char		*name;
