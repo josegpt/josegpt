@@ -16,7 +16,7 @@
 
 #include <err.h>
 #include <html.h>
-#include <json.h>
+#include <json-c/json.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

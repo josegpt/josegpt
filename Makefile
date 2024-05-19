@@ -1,14 +1,8 @@
 PREFIX=		${DESTDIR}/var/www
 CGIDIR=		${PREFIX}/cgi-bin
 
-HTMLINC=	/usr/local/include
-HTMLLIB=	/usr/local/lib
-
-JSONINC=	/usr/local/include/json-c
-JSONLIB=	/usr/local/lib
-
-INCS=		-I${JSONINC} -I${HTMLINC}
-LIBS=		-L${JSONLIB} -ljson-c -L${HTMLLIB} -lhtml
+INCS=		-I/usr/local/include
+LIBS=		-L/usr/local/lib -ljson-c -lhtml
 
 CFLAGS=		-O2 -g -W -Wall -Werror -Wextra -pedantic ${INCS}
 LDFLAGS=	-static -pie ${LIBS}
