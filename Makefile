@@ -1,5 +1,3 @@
-VERSION?=	dev
-
 PREFIX=		${DESTDIR}/var/www
 CGIDIR=		${PREFIX}/cgi-bin
 
@@ -18,7 +16,7 @@ LDFLAGS=	-static -pie ${LIBS}
 all: josegpt
 
 .c.o:
-	${CC} -DVERSION=\"${VERSION}\" ${CFLAGS} -c $<
+	${CC} ${CFLAGS} -c $<
 
 josegpt: josegpt.o
 	${CC} -o $@ ${LDFLAGS} $?

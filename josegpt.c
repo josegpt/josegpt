@@ -500,10 +500,6 @@ main(void)
 	html_text(&html, "text-align:center");
 	html_endclass(&html);
 
-	html_beginsmall(&html);
-	html_text(&html, "josegpt:%s &copy; 2017", VERSION);
-	html_endsmall(&html);
-
 	html_endfooter(&html);
 	html_endbody(&html);
 	html_end(&html);
