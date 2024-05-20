@@ -14,9 +14,9 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <cjson/cJSON.h>
 #include <err.h>
 #include <html.h>
-#include <json-c/json.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,11 +31,11 @@ struct project {
 	struct project	*next;
 };
 
-struct project	*getpp(void);
+struct project	*getpp(char *);
 struct project	*createp(const char *, const char *, const char *,
     const char *, const char *);
-struct project	*json2pp(void);
 void		 freep(struct project *);
+char		*readfile(const char *);
 const char	*map(const char *);
 void		*ecalloc(size_t, size_t);
 char		*estrdup(const char *);
@@ -58,48 +58,35 @@ static struct {
 };
 
 struct project *
-getpp(void)
-{
-	struct project *pp;
-
-	pp = json2pp();
-	return (pp);
-}
-
-struct project *
-json2pp(void)
+getpp(char *s)
 {
 	struct project *p, *ph, **pt;
-	struct json_object *json, *desc, *lang, *lic;
-	struct json_object *name, *o, *url, *spdx;
-	const char *filename;
-	int i, n;
+	cJSON *json, *desc, *lang, *lic;
+	cJSON *name, *o, *spdx, *url;
 
 	ph = NULL;
 	pt = &ph;
-	filename = "/cache/projects.json";
-	json = json_object_from_file(filename);
+	json = cJSON_Parse(s);
 	if (json) {
-		n = json_object_array_length(json);
-		for (i = 0; i < n; ++i) {
-			o = json_object_array_get_idx(json, i);
-			json_object_object_get_ex(o, "name", &name);
-			json_object_object_get_ex(o, "description", &desc);
-			json_object_object_get_ex(o, "html_url", &url);
-			json_object_object_get_ex(o, "license", &lic);
-			json_object_object_get_ex(o, "language", &lang);
-			json_object_object_get_ex(lic, "spdx_id", &spdx);
-			p = createp(json_object_get_string(name),
-			    (desc ? json_object_get_string(desc) : "nodesc"),
-			    json_object_get_string(url),
-			    (spdx ? json_object_get_string(spdx) : ""),
-			    (lang ? json_object_get_string(lang) : ""));
+		cJSON_ArrayForEach(o, json) {
+			name = cJSON_GetObjectItemCaseSensitive(o, "name");
+			desc = cJSON_GetObjectItemCaseSensitive(o, "description");
+			url  = cJSON_GetObjectItemCaseSensitive(o, "html_url");
+			lang = cJSON_GetObjectItemCaseSensitive(o, "language");
+			lic  = cJSON_GetObjectItemCaseSensitive(o, "license");
+			if (cJSON_IsObject(o))
+				spdx  = cJSON_GetObjectItemCaseSensitive(lic, "spdx_id");
+			p = createp(cJSON_IsString(name) ? name->valuestring : "noname",
+			    cJSON_IsString(desc) ? desc->valuestring : "nodesc",
+			    cJSON_IsString(url)  ? url->valuestring  : "nourl",
+			    cJSON_IsString(spdx) ? spdx->valuestring  : "nolic",
+			    cJSON_IsString(lang) ? lang->valuestring : "nolang");
 			*pt = p;
 			pt = &p->next;
 		}
-		json_object_put(json);
+		cJSON_Delete(json);
 	} else
-		warn("could not read %s", filename);
+		warn("could not parse json: %s", cJSON_GetErrorPtr());
 	return (ph);
 }
 
@@ -110,7 +97,7 @@ createp(const char *name, const char *desc, const char *url,
 	struct project *p;
 	const char *s;
 
-	p = ecalloc(1, sizeof(struct project));
+	p = (struct project *)ecalloc(1, sizeof(struct project));
 	p->name = estrdup(name);
 	p->desc = estrdup(desc);
 	p->url  = estrdup(url);
@@ -128,6 +115,26 @@ freep(struct project *p)
 	free(p->lic);
 	free(p->lang);
 	free(p);
+}
+
+char *
+readfile(const char *filename)
+{
+	FILE *fp;
+	char *result;
+	long count;
+
+	result = NULL;
+	fp = fopen(filename, "r");
+	if (fp) {
+		fseek(fp, 0, SEEK_END);
+		count = ftell(fp);
+		fseek(fp, 0, SEEK_SET);
+		result = (char *)ecalloc(1, count + 1);
+		fread(result, count, 1, fp);
+		fclose(fp);
+	}
+	return (result);
 }
 
 const char *
@@ -174,9 +181,12 @@ main(void)
 {
 	static struct html html;
 	struct project *p, *t;
+	char *json;
 
 	if (pledge("stdio rpath", NULL) == -1)
 		err(EXIT_FAILURE, "pledge");
+
+	json = readfile("/cache/projects.json");
 
 	puts("Status: 200 OK\r");
 	puts("Content-Type: text/html\r");
@@ -375,7 +385,7 @@ main(void)
 	html_endnav(&html);
 	html_endheader(&html);
 
-	if ((p = getpp())) {
+	if ((p = getpp(json))) {
 		html_beginmain(&html);
 		html_beginclass(&html);
 		html_text(&html, "stack");

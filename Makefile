@@ -2,9 +2,9 @@ PREFIX=		${DESTDIR}/var/www
 CGIDIR=		${PREFIX}/cgi-bin
 
 INCS=		-I/usr/local/include
-LIBS=		-L/usr/local/lib -ljson-c -lhtml
+LIBS=		-L/usr/local/lib -lcjson -lhtml
 
-CFLAGS=		-O2 -g -W -Wall -Werror -Wextra -pedantic ${INCS}
+CFLAGS=		-O2 -g -W -Wall -Werror -Wextra -pedantic -ansi ${INCS}
 LDFLAGS=	-static -pie ${LIBS}
 
 all: josegpt
