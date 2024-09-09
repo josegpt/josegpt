@@ -1,4 +1,4 @@
-ed hello.txt
+ed greet.txt
 a
 hello there!
 .
